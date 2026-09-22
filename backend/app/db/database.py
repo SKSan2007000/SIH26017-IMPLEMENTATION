@@ -3,12 +3,35 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from backend.app.core.config import settings
 
+import os
+import shutil
+
+db_url = settings.DATABASE_URL
+
+if os.environ.get("VERCEL") and db_url.startswith("sqlite"):
+    tmp_db_path = "/tmp/landguard.db"
+    if not os.path.exists(tmp_db_path):
+        possible_srcs = [
+            os.path.abspath("landguard.db"),
+            os.path.abspath("backend/landguard.db"),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "landguard.db")),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "landguard.db")),
+        ]
+        for src in possible_srcs:
+            if os.path.exists(src) and os.path.isfile(src):
+                try:
+                    shutil.copy2(src, tmp_db_path)
+                    break
+                except Exception as e:
+                    print(f"Notice: SQLite /tmp initialization: {e}")
+    db_url = f"sqlite:///{tmp_db_path}"
+
 connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
+if db_url.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    db_url,
     connect_args=connect_args,
     echo=False,
 )

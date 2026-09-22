@@ -5,14 +5,32 @@
  * with token injection and standard HTTP methods.
  */
 
-let apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+let customApiBaseUrl: string | null = null;
 
 export function getApiBaseUrl(): string {
-  return apiBaseUrl || 'http://localhost:8000';
+  if (customApiBaseUrl !== null) {
+    return customApiBaseUrl;
+  }
+  if (process.env.NEXT_PUBLIC_API_BASE_URL !== undefined && process.env.NEXT_PUBLIC_API_BASE_URL !== '') {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+  if (process.env.NEXT_PUBLIC_API_URL !== undefined && process.env.NEXT_PUBLIC_API_URL !== '') {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  // Client-side execution in browser
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      // Production deployment on Vercel / custom domain uses same-origin relative paths
+      return '';
+    }
+  }
+  // Local development fallback
+  return 'http://127.0.0.1:8000';
 }
 
 export function setApiBaseUrl(url: string) {
-  apiBaseUrl = url;
+  customApiBaseUrl = url;
 }
 
 export function isBackendConfigured(): boolean {
@@ -37,8 +55,8 @@ function getAuthToken(): string | null {
   return null;
 }
 
-function normalizePath(base: string, path: string): string {
-  let cleanBase = base.replace(/\/+$/, '');
+export function normalizePath(base: string, path: string): string {
+  let cleanBase = (base || '').replace(/\/+$/, '');
   let cleanPath = path.startsWith('/') ? path : `/${path}`;
 
   // If base does not contain /api and cleanPath does not start with /api or root endpoints (/health, /docs), route via /api/v1
@@ -47,6 +65,7 @@ function normalizePath(base: string, path: string): string {
     !cleanPath.startsWith('/api') &&
     !cleanPath.startsWith('/health') &&
     !cleanPath.startsWith('/docs') &&
+    !cleanPath.startsWith('/redoc') &&
     !cleanPath.startsWith('/openapi.json')
   ) {
     cleanPath = `/api/v1${cleanPath}`;

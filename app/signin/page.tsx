@@ -142,7 +142,7 @@ export default function SignInPage() {
       if (isConnectionError) {
         setBackendOffline(true);
         setError(
-          'Backend server is not running on port 8000. Start it with uvicorn or click "Continue in Demo Mode" below to proceed immediately.'
+          'Backend server is not responding. Please check server status or click "Continue in Demo Mode" below to proceed immediately.'
         );
       } else {
         setError(msg);
@@ -252,7 +252,7 @@ export default function SignInPage() {
                 )}
               />
               <span className="text-txt-secondary">
-                {backendIsLive ? 'Backend Online (FastAPI :8000)' : 'Backend Standby (FastAPI / Demo Ready)'}
+                {backendIsLive ? 'Backend Online (FastAPI)' : 'Backend Standby (FastAPI / Demo Ready)'}
               </span>
             </div>
           )}

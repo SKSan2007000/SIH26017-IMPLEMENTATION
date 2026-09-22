@@ -45,8 +45,8 @@ if isinstance(settings.BACKEND_CORS_ORIGINS, list):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:[0-9]+)?",
+    allow_origins=origins if origins else ["*"],
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:[0-9]+)?|https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -68,10 +68,20 @@ app.include_router(api_router, prefix="/api")
 import os
 from fastapi.staticfiles import StaticFiles
 
-# Mount static files directory for evidence photos & design packages
-UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "uploads"))
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+# Mount static files directory for evidence photos & design packages (serverless safe)
+UPLOAD_DIR = os.environ.get("UPLOAD_DIR")
+if not UPLOAD_DIR:
+    if os.environ.get("VERCEL"):
+        UPLOAD_DIR = "/tmp/landguard_uploads"
+    else:
+        UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "uploads"))
+
+try:
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+except Exception as e:
+    print(f"Notice: Static upload directory mounting: {e}")
+
 
 
 # Preflight options handler

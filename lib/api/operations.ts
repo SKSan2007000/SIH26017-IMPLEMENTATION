@@ -1,4 +1,4 @@
-import { http, isBackendConfigured } from './httpClient';
+import { http, isBackendConfigured, getApiBaseUrl, normalizePath } from './httpClient';
 import { MOCK_OFFICERS } from '@/lib/mock';
 
 export interface TodayOperationItem {
@@ -290,7 +290,9 @@ export const operationsApi = {
 
   uploadEvidence: async (taskId: string, formData: FormData): Promise<any> => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('landguard_token') : null;
-    const res = await fetch(`http://127.0.0.1:8000/api/v1/operations/tasks/${taskId}/upload-evidence`, {
+    const base = getApiBaseUrl();
+    const url = normalizePath(base, `/api/v1/operations/tasks/${taskId}/upload-evidence`);
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
