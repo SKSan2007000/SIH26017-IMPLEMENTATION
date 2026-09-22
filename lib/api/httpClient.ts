@@ -84,11 +84,7 @@ export function normalizePath(base: string, path: string): string {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const base = getApiBaseUrl();
-  if (!base) {
-    throw new Error('NEXT_PUBLIC_API_URL is not set — httpClient should not be called without it.');
-  }
-
+  const base = getApiBaseUrl() ?? '';
   const url = normalizePath(base, path);
   const token = getAuthToken();
 
