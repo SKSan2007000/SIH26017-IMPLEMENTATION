@@ -1,18 +1,52 @@
-from typing import List, Union
-from pydantic import AnyHttpUrl, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
 import json
+from typing import List, Union, Optional
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def get_default_db_url() -> str:
+    """Resolve database URL from various production environment variable names."""
+    url = (
+        os.environ.get("DATABASE_URL")
+        or os.environ.get("POSTGRES_URL")
+        or os.environ.get("POSTGRES_PRISMA_URL")
+        or os.environ.get("POSTGRES_URL_NON_POOLING")
+        or "sqlite:///./landguard.db"
+    )
+    # SQLAlchemy 2.0 requires postgresql:// instead of postgres://
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    return url
+
+
+def get_default_secret_key() -> str:
+    """Resolve JWT secret key from environment."""
+    return (
+        os.environ.get("SECRET_KEY")
+        or os.environ.get("JWT_SECRET")
+        or "landguard-production-jwt-signing-secret-key-2026"
+    )
+
+
+def get_default_algorithm() -> str:
+    """Resolve JWT algorithm from environment."""
+    return (
+        os.environ.get("ALGORITHM")
+        or os.environ.get("JWT_ALGORITHM")
+        or "HS256"
+    )
 
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "LandGuard AI API"
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = "landguard-demo-secret-key-change-for-production-environment"
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
+    SECRET_KEY: str = get_default_secret_key()
+    ALGORITHM: str = get_default_algorithm()
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))  # 24 hours
 
     # Database URL: default SQLite for instant portability, or PostgreSQL+PostGIS
-    DATABASE_URL: str = "sqlite:///./landguard.db"
+    DATABASE_URL: str = get_default_db_url()
 
     # CORS origins
     BACKEND_CORS_ORIGINS: Union[List[str], str] = [
@@ -39,3 +73,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

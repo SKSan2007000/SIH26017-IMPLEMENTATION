@@ -1,4 +1,5 @@
 import uuid
+import logging
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from backend.app.core.security import get_password_hash, UserRole
@@ -25,38 +26,11 @@ from backend.app.db.models.design import (
     DesignPackage,
 )
 
+logger = logging.getLogger("landguard.seed")
 
-def seed_database(db: Session, force: bool = False):
-    # Clear existing if force
-    if force:
-        db.query(DesignPackage).delete()
-        db.query(DesignChangeRequest).delete()
-        db.query(DesignVersion).delete()
-        db.query(Design).delete()
-        db.query(ProjectAssignment).delete()
-        db.query(StakeholderBenefitRecord).delete()
-        db.query(GovernmentAlert).delete()
-        db.query(ContractorWorkPackage).delete()
-        db.query(OfficerProfile).delete()
-        db.query(AuditLog).delete()
-        db.query(RiskFactor).delete()
-        db.query(RiskPrediction).delete()
-        db.query(Notification).delete()
-        db.query(CitizenReport).delete()
-        db.query(FieldVerification).delete()
-        db.query(Document).delete()
-        db.query(Stakeholder).delete()
-        db.query(Parcel).delete()
-        db.query(Route).delete()
-        db.query(Project).delete()
-        db.query(User).delete()
-        db.commit()
 
-    # Check if database is already seeded with project and user content
-    if not force and db.query(Project).count() >= 10 and db.query(User).count() >= 10:
-        return
-
-    # 1. RBAC DEMO USERS (For all 8 roles - Always ensure idempotent availability)
+def seed_demo_users(db: Session):
+    """Idempotently creates or updates all 18 standard RBAC demo accounts."""
     demo_users = [
         # Official prompt requested admin demo account
         ("admin@landguard.ai", "LandGuard System Administrator", UserRole.SUPER_ADMIN, "Super Administrator", "Central Administration", "admin-00"),
@@ -100,10 +74,54 @@ def seed_database(db: Session, force: bool = False):
             existing.hashed_password = get_password_hash("LandGuard@2026")
             existing.role = role.value
             existing.is_active = True
+            existing.is_superuser = (role == UserRole.SUPER_ADMIN)
     try:
         db.commit()
-    except Exception:
+    except Exception as e:
         db.rollback()
+        logger.warning(f"Notice during demo users commit: {e}")
+
+
+def seed_database(db: Session, force: bool = False):
+    # Clear existing if force
+    if force:
+        try:
+            db.query(DesignPackage).delete()
+            db.query(DesignChangeRequest).delete()
+            db.query(DesignVersion).delete()
+            db.query(Design).delete()
+            db.query(ProjectAssignment).delete()
+            db.query(StakeholderBenefitRecord).delete()
+            db.query(GovernmentAlert).delete()
+            db.query(ContractorWorkPackage).delete()
+            db.query(OfficerProfile).delete()
+            db.query(AuditLog).delete()
+            db.query(RiskFactor).delete()
+            db.query(RiskPrediction).delete()
+            db.query(Notification).delete()
+            db.query(CitizenReport).delete()
+            db.query(FieldVerification).delete()
+            db.query(Document).delete()
+            db.query(Stakeholder).delete()
+            db.query(Parcel).delete()
+            db.query(Route).delete()
+            db.query(Project).delete()
+            db.query(User).delete()
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            logger.warning(f"Notice during force delete: {e}")
+
+    # 1. Always ensure all demo users exist
+    seed_demo_users(db)
+
+    # Check if projects are already seeded
+    if not force:
+        try:
+            if db.query(Project).count() >= 10:
+                return
+        except Exception:
+            pass
 
     print("Seeding LandGuard AI database with 10 projects, 40 routes, multi-designs, 120+ parcels & stakeholders...")
 

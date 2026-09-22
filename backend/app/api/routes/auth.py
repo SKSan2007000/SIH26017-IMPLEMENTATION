@@ -1,8 +1,9 @@
+import logging
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
 from sqlalchemy.orm import Session
 import uuid
-from backend.app.db.database import get_db
+from backend.app.db.database import get_db, init_db, engine
 from backend.app.db.models.user import User
 from backend.app.db.models.project import Project
 from backend.app.db.models.parcel import Parcel
@@ -21,6 +22,8 @@ from backend.app.schemas.token import Token
 from backend.app.core.security import verify_password, get_password_hash, create_access_token, UserRole
 from backend.app.api.deps import get_current_active_user, require_roles
 
+logger = logging.getLogger("landguard.auth")
+
 router = APIRouter()
 
 
@@ -36,17 +39,64 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     if not req.password or not req.password.strip():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password is required")
 
-    user = db.query(User).filter(User.email == req.email.lower().strip()).first()
+    clean_email = req.email.lower().strip()
+    logger.info(f"POST /api/v1/auth/login received for {clean_email}")
+
+    user = None
+    try:
+        user = db.query(User).filter(User.email == clean_email).first()
+    except Exception as e:
+        logger.error(f"Database query error during login for {clean_email}: {e}", exc_info=True)
+        # Attempt recovery if database was not initialized
+        try:
+            init_db(engine)
+            user = db.query(User).filter(User.email == clean_email).first()
+        except Exception as retry_err:
+            logger.error(f"Database recovery failed: {retry_err}", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Database connectivity issue. Please try again shortly.",
+            )
+
+    # If demo user is requested but not yet in DB, trigger idempotent seed
+    if not user and clean_email in [
+        "admin@landguard.ai",
+        "admin@landguard.gov.in",
+        "head@landguard.ai",
+        "head@landguard.gov.in",
+        "district@landguard.ai",
+        "district@landguard.gov.in",
+        "lao@landguard.ai",
+        "lao@landguard.gov.in",
+        "field@landguard.ai",
+        "field@landguard.gov.in",
+        "supervisor@landguard.ai",
+        "supervisor@landguard.gov.in",
+        "citizen@landguard.ai",
+        "contractor@landguard.ai",
+    ]:
+        try:
+            from backend.app.db.seed import seed_database
+            logger.info(f"Demo user {clean_email} missing. Seeding database...")
+            seed_database(db, force=False)
+            user = db.query(User).filter(User.email == clean_email).first()
+        except Exception as seed_err:
+            logger.error(f"Error seeding demo user: {seed_err}", exc_info=True)
+
     if not user or not verify_password(req.password, user.hashed_password):
+        logger.warning(f"Failed authentication attempt for {clean_email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     if not user.is_active:
+        logger.warning(f"Login rejected for inactive user {clean_email}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user account")
 
     token = create_access_token(subject=user.id, role=user.role)
+    logger.info(f"User {user.email} (role: {user.role}) authenticated successfully")
     return Token(
         access_token=token,
         token_type="bearer",
@@ -55,6 +105,7 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
         email=user.email,
         full_name=user.full_name,
     )
+
 
 
 @router.get("/me", response_model=UserResponse)

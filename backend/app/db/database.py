@@ -1,10 +1,12 @@
+import os
+import shutil
+import logging
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from backend.app.core.config import settings
 
-import os
-import shutil
+logger = logging.getLogger("landguard.db")
 
 db_url = settings.DATABASE_URL
 
@@ -21,28 +23,36 @@ if os.environ.get("VERCEL") and db_url.startswith("sqlite"):
             if os.path.exists(src) and os.path.isfile(src):
                 try:
                     shutil.copy2(src, tmp_db_path)
+                    logger.info(f"Copied base database from {src} to {tmp_db_path}")
                     break
                 except Exception as e:
-                    print(f"Notice: SQLite /tmp initialization: {e}")
+                    logger.warning(f"Notice: SQLite /tmp initialization: {e}")
     db_url = f"sqlite:///{tmp_db_path}"
 
 connect_args = {}
+engine_kwargs = {"echo": False}
 if db_url.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
+    engine_kwargs["connect_args"] = connect_args
+else:
+    # PostgreSQL production pool settings
+    engine_kwargs["pool_pre_ping"] = True
+    engine_kwargs["pool_recycle"] = 300
 
 engine = create_engine(
     db_url,
-    connect_args=connect_args,
-    echo=False,
+    **engine_kwargs,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+_db_initialized = False
+
 
 def ensure_schema_migrations(eng=None):
-    """Ensures newly added columns are present in existing SQLite tables."""
+    """Ensures newly added columns are present in existing database tables."""
     target_engine = eng or engine
     try:
         inspector = inspect(target_engine)
@@ -113,17 +123,52 @@ def ensure_schema_migrations(eng=None):
                     conn.execute(text("ALTER TABLE notifications ADD COLUMN priority VARCHAR DEFAULT 'HIGH'"))
                 conn.commit()
     except Exception as e:
-        print(f"Warning during schema migration: {e}")
+        logger.warning(f"Warning during schema migration: {e}")
 
 
-# Run migrations on import
-ensure_schema_migrations(engine)
+def init_db(target_engine=None):
+    """Initializes schema and ensures demo seed data is present."""
+    global _db_initialized
+    eng = target_engine or engine
+    try:
+        # Import all models to register them with Base.metadata
+        import backend.app.db.models  # noqa: F401
+        Base.metadata.create_all(bind=eng)
+        ensure_schema_migrations(eng)
+        
+        # Verify demo user presence
+        from backend.app.db.models.user import User
+        from backend.app.db.seed import seed_database
+        
+        db = SessionLocal()
+        try:
+            admin_user = db.query(User).filter(User.email == "admin@landguard.ai").first()
+            if not admin_user:
+                logger.info("Initializing baseline database with demo users & projects...")
+                seed_database(db, force=False)
+        finally:
+            db.close()
+            
+        _db_initialized = True
+    except Exception as e:
+        logger.error(f"Error initializing database: {e}", exc_info=True)
+
+
+# Run initial migration and schema setup on load
+init_db(engine)
 
 
 def get_db():
+    global _db_initialized
+    if not _db_initialized:
+        try:
+            init_db(engine)
+        except Exception as e:
+            logger.warning(f"Lazy init_db in get_db exception: {e}")
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
