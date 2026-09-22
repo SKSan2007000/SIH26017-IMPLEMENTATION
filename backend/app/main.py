@@ -56,13 +56,17 @@ app.add_middleware(
 
 
 @app.get("/health", tags=["System Health"])
+@app.get("/api/backend/health", tags=["System Health"])
 def health_check():
     return {"status": "ok", "service": "LandGuard API"}
 
 
-# Include both /api/v1 and /api for backwards & frontend contract compatibility
+# Include routes on standard paths and Vercel Services /api/backend path
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.include_router(api_router, prefix="/api")
+app.include_router(api_router, prefix="/api/backend/v1")
+app.include_router(api_router, prefix="/api/backend/api/v1")
+app.include_router(api_router, prefix="/api/backend")
 
 
 import os
