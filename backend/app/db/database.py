@@ -71,6 +71,13 @@ def ensure_schema_migrations(eng=None):
             if "projects" in tables:
                 cols = [c["name"] for c in inspector.get_columns("projects")]
                 new_project_cols = [
+                    ("workflow_state", "VARCHAR DEFAULT 'PLANNING'"),
+                    ("overall_progress", "FLOAT DEFAULT 25.0"),
+                    ("land_acquisition_progress", "FLOAT DEFAULT 30.0"),
+                    ("construction_progress", "FLOAT DEFAULT 0.0"),
+                    ("parcels_count", "INTEGER DEFAULT 0"),
+                    ("stakeholders_count", "INTEGER DEFAULT 0"),
+                    ("active_contractor_id", "VARCHAR"),
                     ("description", "VARCHAR"),
                     ("taluk", "VARCHAR"),
                     ("city", "VARCHAR"),
@@ -88,6 +95,33 @@ def ensure_schema_migrations(eng=None):
                         conn.execute(text(f"ALTER TABLE projects ADD COLUMN {col_name} {col_type}"))
                 conn.commit()
 
+            if "parcels" in tables:
+                cols = [c["name"] for c in inspector.get_columns("parcels")]
+                new_parcel_cols = [
+                    ("structures_present", "BOOLEAN DEFAULT 0"),
+                    ("structure_type", "VARCHAR"),
+                    ("disputed", "BOOLEAN DEFAULT 0"),
+                    ("risk_contribution", "VARCHAR DEFAULT 'low'"),
+                    ("area_sq_ft", "FLOAT DEFAULT 10000.0"),
+                    ("documents_complete", "INTEGER DEFAULT 0"),
+                    ("documents_required", "INTEGER DEFAULT 4"),
+                ]
+                for col_name, col_type in new_parcel_cols:
+                    if col_name not in cols:
+                        conn.execute(text(f"ALTER TABLE parcels ADD COLUMN {col_name} {col_type}"))
+                conn.commit()
+
+            if "documents" in tables:
+                cols = [c["name"] for c in inspector.get_columns("documents")]
+                new_doc_cols = [
+                    ("file_url", "VARCHAR"),
+                    ("verification_status", "VARCHAR DEFAULT 'PENDING'"),
+                ]
+                for col_name, col_type in new_doc_cols:
+                    if col_name not in cols:
+                        conn.execute(text(f"ALTER TABLE documents ADD COLUMN {col_name} {col_type}"))
+                conn.commit()
+
             if "project_assignments" in tables:
                 cols = [c["name"] for c in inspector.get_columns("project_assignments")]
                 new_assign_cols = [
@@ -95,6 +129,7 @@ def ensure_schema_migrations(eng=None):
                     ("assignment_reason", "TEXT"),
                     ("score_breakdown", "JSON"),
                     ("capacity_status", "VARCHAR DEFAULT 'AVAILABLE'"),
+                    ("assigned_at", "DATETIME"),
                 ]
                 for col_name, col_type in new_assign_cols:
                     if col_name not in cols:
@@ -103,27 +138,46 @@ def ensure_schema_migrations(eng=None):
 
             if "field_verifications" in tables:
                 cols = [c["name"] for c in inspector.get_columns("field_verifications")]
-                if "allocation_reason" not in cols:
-                    conn.execute(text("ALTER TABLE field_verifications ADD COLUMN allocation_reason VARCHAR"))
-                if "officer_zone" not in cols:
-                    conn.execute(text("ALTER TABLE field_verifications ADD COLUMN officer_zone VARCHAR"))
-                if "officer_district" not in cols:
-                    conn.execute(text("ALTER TABLE field_verifications ADD COLUMN officer_district VARCHAR"))
-                if "proximity_km" not in cols:
-                    conn.execute(text("ALTER TABLE field_verifications ADD COLUMN proximity_km FLOAT"))
+                new_fv_cols = [
+                    ("allocation_reason", "VARCHAR"),
+                    ("officer_zone", "VARCHAR"),
+                    ("officer_district", "VARCHAR"),
+                    ("proximity_km", "FLOAT"),
+                    ("supervisor_decision", "VARCHAR"),
+                    ("observation", "TEXT"),
+                ]
+                for col_name, col_type in new_fv_cols:
+                    if col_name not in cols:
+                        conn.execute(text(f"ALTER TABLE field_verifications ADD COLUMN {col_name} {col_type}"))
+                conn.commit()
+
+            if "officer_profiles" in tables:
+                cols = [c["name"] for c in inspector.get_columns("officer_profiles")]
+                new_op_cols = [
+                    ("points_tier", "VARCHAR DEFAULT 'Gold'"),
+                    ("active_district", "VARCHAR DEFAULT 'Chennai'"),
+                    ("current_workload", "INTEGER DEFAULT 0"),
+                    ("is_available", "BOOLEAN DEFAULT 1"),
+                ]
+                for col_name, col_type in new_op_cols:
+                    if col_name not in cols:
+                        conn.execute(text(f"ALTER TABLE officer_profiles ADD COLUMN {col_name} {col_type}"))
                 conn.commit()
 
             if "notifications" in tables:
                 cols = [c["name"] for c in inspector.get_columns("notifications")]
-                if "title" not in cols:
-                    conn.execute(text("ALTER TABLE notifications ADD COLUMN title VARCHAR DEFAULT 'Platform Notification'"))
-                if "action_url" not in cols:
-                    conn.execute(text("ALTER TABLE notifications ADD COLUMN action_url VARCHAR"))
-                if "priority" not in cols:
-                    conn.execute(text("ALTER TABLE notifications ADD COLUMN priority VARCHAR DEFAULT 'HIGH'"))
+                new_notif_cols = [
+                    ("title", "VARCHAR DEFAULT 'Platform Notification'"),
+                    ("action_url", "VARCHAR"),
+                    ("priority", "VARCHAR DEFAULT 'HIGH'"),
+                ]
+                for col_name, col_type in new_notif_cols:
+                    if col_name not in cols:
+                        conn.execute(text(f"ALTER TABLE notifications ADD COLUMN {col_name} {col_type}"))
                 conn.commit()
     except Exception as e:
         logger.warning(f"Warning during schema migration: {e}")
+
 
 
 def init_db(target_engine=None):

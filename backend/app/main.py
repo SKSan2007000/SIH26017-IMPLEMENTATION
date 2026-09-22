@@ -1,8 +1,20 @@
+import sys
+import os
+import types
+
+# Ensure backend and repository root are in Python path
+app_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.dirname(app_dir)
+root_dir = os.path.dirname(backend_dir)
+for p in [root_dir, backend_dir, app_dir]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from backend.app.core.config import settings
-from backend.app.db.database import engine, Base, SessionLocal
+from backend.app.db.database import engine, Base, SessionLocal, init_db
 import backend.app.db.models  # load all models
 from backend.app.db.seed import seed_database
 from backend.app.api.routes import api_router
@@ -11,7 +23,7 @@ from backend.app.api.routes import api_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Create tables and auto-seed if empty
-    Base.metadata.create_all(bind=engine)
+    init_db(engine)
     db = SessionLocal()
     try:
         seed_database(db)
@@ -67,6 +79,8 @@ app.include_router(api_router, prefix="/api")
 app.include_router(api_router, prefix="/api/backend/v1")
 app.include_router(api_router, prefix="/api/backend/api/v1")
 app.include_router(api_router, prefix="/api/backend")
+app.include_router(api_router, prefix="")
+
 
 
 import os
