@@ -1,0 +1,40 @@
+{
+  "name": "landguard-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LandGuard AI — Predictive Analytics System for Early Detection of Land Acquisition Delays (SIH26017). Frontend prototype. Demo/simulation data only.",
+  "scripts": {
+    "postinstall": "node scripts/copy-cesium.mjs",
+    "predev": "node scripts/copy-cesium.mjs",
+    "prebuild": "node scripts/copy-cesium.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cesium": "^1.120.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.3.19",
+    "lucide-react": "^0.383.0",
+    "maplibre-gl": "^3.6.2",
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "zustand": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "copy-webpack-plugin": "^12.0.2",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.5",
+    "playwright": "^1.63.0",
+    "postcss": "^8.4.40",
+    "tailwindcss": "^3.4.7",
+    "typescript": "^5.5.4"
+  }
+}
