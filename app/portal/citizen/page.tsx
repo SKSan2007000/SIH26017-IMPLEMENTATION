@@ -18,6 +18,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import { DemoFlag, GlassPanel, PanelHead, Button } from '@/components/ui/Primitives';
 import { useAuthStore } from '@/lib/store/useAuthStore';
 import { useAppStore } from '@/lib/store/useAppStore';
@@ -106,7 +107,8 @@ export default function CitizenPortalPage() {
 
   return (
     <AppShell>
-      {/* Citizen Header */}
+      <AuthGuard allowedRoles={['CITIZEN', 'SUPER_ADMIN']}>
+        {/* Citizen Header */}
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2.5">
         <div>
           <div className="flex items-center gap-2">
@@ -296,6 +298,7 @@ export default function CitizenPortalPage() {
           </GlassPanel>
         </div>
       </div>
+      </AuthGuard>
     </AppShell>
   );
 }

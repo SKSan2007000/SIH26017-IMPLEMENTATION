@@ -36,11 +36,13 @@ def seed_demo_users(db: Session):
         ("admin@landguard.ai", "LandGuard System Administrator", UserRole.SUPER_ADMIN, "Super Administrator", "Central Administration", "admin-00"),
         ("admin@landguard.gov.in", "System Administrator", UserRole.SUPER_ADMIN, "Chief Information Officer", "Central Administration", "admin-01"),
         # Other role demo accounts (@landguard.ai & @landguard.gov.in)
-        ("head@landguard.ai", "Dr. A. Sundaram (DEMO)", UserRole.PROJECT_HEAD, "Project Director — National Corridors", "National Corridors Division", "head-00"),
+        ("projecthead@landguard.ai", "Dr. A. Sundaram (DEMO)", UserRole.PROJECT_HEAD, "Project Director — National Corridors", "National Corridors Division", "head-00"),
+        ("head@landguard.ai", "Dr. A. Sundaram (DEMO)", UserRole.PROJECT_HEAD, "Project Director — National Corridors", "National Corridors Division", "head-02"),
         ("head@landguard.gov.in", "Dr. A. Sundaram (DEMO)", UserRole.PROJECT_HEAD, "Project Director — National Corridors", "National Corridors Division", "head-01"),
         ("district@landguard.ai", "M. K. Revathi IAS (DEMO)", UserRole.DISTRICT_OFFICER, "District Collector — Chennai", "District Administration Chennai", "dist-00"),
         ("district@landguard.gov.in", "M. K. Revathi IAS (DEMO)", UserRole.DISTRICT_OFFICER, "District Collector — Chennai", "District Administration Chennai", "dist-01"),
-        ("lao@landguard.ai", "K. Rajagopal (DEMO)", UserRole.LAND_ACQUISITION_OFFICER, "Special LAO — Corridor Division", "Land Acquisition Wing", "lao-00"),
+        ("acquisition@landguard.ai", "K. Rajagopal (DEMO)", UserRole.LAND_ACQUISITION_OFFICER, "Special LAO — Corridor Division", "Land Acquisition Wing", "lao-00"),
+        ("lao@landguard.ai", "K. Rajagopal (DEMO)", UserRole.LAND_ACQUISITION_OFFICER, "Special LAO — Corridor Division", "Land Acquisition Wing", "lao-02"),
         ("lao@landguard.gov.in", "K. Rajagopal (DEMO)", UserRole.LAND_ACQUISITION_OFFICER, "Special LAO — Corridor Division", "Land Acquisition Wing", "lao-01"),
         ("field@landguard.ai", "R. Vignesh (DEMO)", UserRole.FIELD_OFFICER, "Senior Field Surveyor", "Field Cadastral Survey Division", "field-00"),
         ("field@landguard.gov.in", "R. Vignesh (DEMO)", UserRole.FIELD_OFFICER, "Senior Field Surveyor", "Field Cadastral Survey Division", "field-01"),
@@ -55,10 +57,11 @@ def seed_demo_users(db: Session):
     ]
 
     for email, name, role, desig, dept, uid in demo_users:
-        existing = db.query(User).filter(User.email == email.lower().strip()).first()
+        user_id = f"USR-{uid.upper()}"
+        existing = db.query(User).filter((User.email == email.lower().strip()) | (User.id == user_id)).first()
         if not existing:
             u = User(
-                id=f"USR-{uid.upper()}",
+                id=user_id,
                 email=email.lower().strip(),
                 full_name=name,
                 hashed_password=get_password_hash("LandGuard@2026"),
@@ -71,6 +74,8 @@ def seed_demo_users(db: Session):
             )
             db.add(u)
         else:
+            existing.email = email.lower().strip()
+            existing.full_name = name
             existing.hashed_password = get_password_hash("LandGuard@2026")
             existing.role = role.value
             existing.is_active = True

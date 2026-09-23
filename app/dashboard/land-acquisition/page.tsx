@@ -24,6 +24,7 @@ import {
   Check,
 } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import { DemoFlag, GlassPanel, PanelHead, Button } from '@/components/ui/Primitives';
 import { useAppStore } from '@/lib/store/useAppStore';
 import { MOCK_PROJECTS, getMockProject } from '@/lib/mock/projects';
@@ -354,9 +355,11 @@ function LandAcquisitionOfficerContent() {
 export default function LandAcquisitionOfficerDashboard() {
   return (
     <AppShell>
-      <Suspense fallback={<div className="p-8 text-center text-cyan animate-pulse">Loading Land Acquisition Workspace...</div>}>
-        <LandAcquisitionOfficerContent />
-      </Suspense>
+      <AuthGuard allowedRoles={['LAND_ACQUISITION_OFFICER', 'SUPER_ADMIN']}>
+        <Suspense fallback={<div className="p-8 text-center text-cyan animate-pulse">Loading Land Acquisition Workspace...</div>}>
+          <LandAcquisitionOfficerContent />
+        </Suspense>
+      </AuthGuard>
     </AppShell>
   );
 }

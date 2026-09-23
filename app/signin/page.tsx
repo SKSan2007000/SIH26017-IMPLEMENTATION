@@ -27,9 +27,9 @@ import clsx from 'clsx';
 
 const ROLE_OPTIONS = [
   { label: 'Super Admin', value: 'SUPER_ADMIN', email: 'admin@landguard.ai', desc: 'Central System Admin' },
-  { label: 'Project Head', value: 'PROJECT_HEAD', email: 'head@landguard.ai', desc: 'Director National Corridors' },
+  { label: 'Project Head', value: 'PROJECT_HEAD', email: 'projecthead@landguard.ai', desc: 'Director National Corridors' },
   { label: 'District Officer', value: 'DISTRICT_OFFICER', email: 'district@landguard.ai', desc: 'District Collector' },
-  { label: 'Land Acquisition Officer', value: 'LAND_ACQUISITION_OFFICER', email: 'lao@landguard.ai', desc: 'Special LAO Corridor' },
+  { label: 'Land Acquisition Officer', value: 'LAND_ACQUISITION_OFFICER', email: 'acquisition@landguard.ai', desc: 'Special LAO Corridor' },
   { label: 'Field Officer', value: 'FIELD_OFFICER', email: 'field@landguard.ai', desc: 'Cadastral Surveyor' },
   { label: 'Supervisor', value: 'SUPERVISOR', email: 'supervisor@landguard.ai', desc: 'Quality & Verification' },
   { label: 'Citizen', value: 'CITIZEN', email: 'citizen@landguard.ai', desc: 'Landowner / Grievances' },

@@ -1,4 +1,4 @@
-from typing import Generator, Optional, List
+from typing import Generator, Optional, List, Union
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
@@ -10,6 +10,13 @@ from backend.app.db.database import get_db
 from backend.app.db.models.user import User
 
 security_scheme = HTTPBearer(auto_error=False)
+
+
+def normalize_role(role_val: Union[str, UserRole]) -> str:
+    """Normalizes role strings and enums to standard uppercase format (e.g. 'super_admin' -> 'SUPER_ADMIN')."""
+    if isinstance(role_val, UserRole):
+        return role_val.value.upper()
+    return str(role_val).strip().upper().replace(" ", "_")
 
 
 def get_current_user(
@@ -37,22 +44,36 @@ def get_current_active_user(
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication credentials required",
+            detail="Authentication credentials required or token expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
     if not current_user.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user account")
     return current_user
 
 
-def require_roles(allowed_roles: List[UserRole]):
+def require_roles(allowed_roles: Union[List[Union[str, UserRole]], Union[str, UserRole]]):
+    """Reusable dependency to verify the current authenticated user has one of the allowed roles."""
+    if not isinstance(allowed_roles, list):
+        roles_list = [allowed_roles]
+    else:
+        roles_list = allowed_roles
+
     def role_checker(current_user: User = Depends(get_current_active_user)) -> User:
-        allowed_str = [r.value if isinstance(r, UserRole) else str(r) for r in allowed_roles]
-        if current_user.role not in allowed_str and current_user.role != UserRole.SUPER_ADMIN.value:
+        allowed_normalized = [normalize_role(r) for r in roles_list]
+        user_role_normalized = normalize_role(current_user.role)
+        
+        # SUPER_ADMIN retains universal administrative clearance
+        if user_role_normalized not in allowed_normalized and user_role_normalized != UserRole.SUPER_ADMIN.value:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Operation not permitted. Required role: {allowed_str}, Current: {current_user.role}",
+                detail=f"Operation not permitted. Required role: {allowed_normalized}, Current: {user_role_normalized}",
             )
         return current_user
 
     return role_checker
+
+
+def require_role(role: Union[str, UserRole, List[Union[str, UserRole]]]):
+    """Alias dependency for singular/multi-role checks e.g. require_role('super_admin'), require_role(UserRole.PROJECT_HEAD)."""
+    return require_roles(role)

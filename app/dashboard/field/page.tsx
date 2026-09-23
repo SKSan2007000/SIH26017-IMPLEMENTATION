@@ -21,6 +21,7 @@ import {
   Crosshair,
 } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import { DemoFlag, GlassPanel, Button } from '@/components/ui/Primitives';
 import { useAppStore } from '@/lib/store/useAppStore';
 import { operationsApi } from '@/lib/api/operations';
@@ -504,9 +505,11 @@ function FieldOfficerContent() {
 export default function FieldOfficerDashboard() {
   return (
     <AppShell>
-      <Suspense fallback={<div className="p-8 text-center text-cyan animate-pulse">Loading Field Officer Portal...</div>}>
-        <FieldOfficerContent />
-      </Suspense>
+      <AuthGuard allowedRoles={['FIELD_OFFICER', 'SUPER_ADMIN']}>
+        <Suspense fallback={<div className="p-8 text-center text-cyan animate-pulse">Loading Field Officer Portal...</div>}>
+          <FieldOfficerContent />
+        </Suspense>
+      </AuthGuard>
     </AppShell>
   );
 }

@@ -36,9 +36,11 @@ export interface AdminStats {
 
 export const DEMO_USERS: UserProfile[] = [
   { id: 'USR-ADMIN-00', email: 'admin@landguard.ai', fullName: 'LandGuard System Administrator', role: 'SUPER_ADMIN', designation: 'Super Administrator', department: 'Central Administration', district: 'Central', zone: 'HQ', isActive: true },
-  { id: 'USR-HEAD-00', email: 'head@landguard.ai', fullName: 'Dr. A. Sundaram (DEMO)', role: 'PROJECT_HEAD', designation: 'Project Director — National Corridors', department: 'National Corridors Division', district: 'Statewide', zone: 'State Grid', isActive: true },
+  { id: 'USR-HEAD-00', email: 'projecthead@landguard.ai', fullName: 'Dr. A. Sundaram (DEMO)', role: 'PROJECT_HEAD', designation: 'Project Director — National Corridors', department: 'National Corridors Division', district: 'Statewide', zone: 'State Grid', isActive: true },
+  { id: 'USR-HEAD-02', email: 'head@landguard.ai', fullName: 'Dr. A. Sundaram (DEMO)', role: 'PROJECT_HEAD', designation: 'Project Director — National Corridors', department: 'National Corridors Division', district: 'Statewide', zone: 'State Grid', isActive: true },
   { id: 'USR-DIST-00', email: 'district@landguard.ai', fullName: 'M. K. Revathi IAS (DEMO)', role: 'DISTRICT_OFFICER', designation: 'District Collector — Chennai', department: 'District Administration Chennai', district: 'Chennai', zone: 'Central Zone', isActive: true },
-  { id: 'USR-LAO-00', email: 'lao@landguard.ai', fullName: 'K. Rajagopal (DEMO)', role: 'LAND_ACQUISITION_OFFICER', designation: 'Special LAO — Corridor Division', department: 'Land Acquisition Wing', district: 'Chennai', zone: 'South Zone', isActive: true },
+  { id: 'USR-LAO-00', email: 'acquisition@landguard.ai', fullName: 'K. Rajagopal (DEMO)', role: 'LAND_ACQUISITION_OFFICER', designation: 'Special LAO — Corridor Division', department: 'Land Acquisition Wing', district: 'Chennai', zone: 'South Zone', isActive: true },
+  { id: 'USR-LAO-02', email: 'lao@landguard.ai', fullName: 'K. Rajagopal (DEMO)', role: 'LAND_ACQUISITION_OFFICER', designation: 'Special LAO — Corridor Division', department: 'Land Acquisition Wing', district: 'Chennai', zone: 'South Zone', isActive: true },
   { id: 'USR-FIELD-00', email: 'field@landguard.ai', fullName: 'R. Vignesh (DEMO)', role: 'FIELD_OFFICER', designation: 'Senior Field Surveyor', department: 'Field Cadastral Survey Division', district: 'Chennai', zone: 'Zone A', isActive: true },
   { id: 'USR-SUP-00', email: 'supervisor@landguard.ai', fullName: 'P. Ananthi (DEMO)', role: 'SUPERVISOR', designation: 'Cadastral Verification Supervisor', department: 'Quality & Verification Wing', district: 'Chennai', zone: 'South Zone', isActive: true },
   { id: 'USR-CIT-00', email: 'citizen@landguard.ai', fullName: 'DEMO Citizen User', role: 'CITIZEN', designation: 'Land Owner Representative', department: 'Citizen Services', district: 'Chennai', zone: 'Zone A', isActive: true },
@@ -330,6 +332,9 @@ export const authApi = {
   },
 
   logout: () => {
+    try {
+      http.post('/api/v1/auth/logout', {}).catch(() => {});
+    } catch {}
     if (typeof window !== 'undefined') {
       localStorage.removeItem('landguard_token');
       localStorage.removeItem('landguard_user');

@@ -15,6 +15,7 @@ import {
   Activity,
 } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import { DemoFlag, GlassPanel } from '@/components/ui/Primitives';
 import { MOCK_AUDIT_EVENTS } from '@/lib/mock/auditEvents';
 import clsx from 'clsx';
@@ -35,6 +36,7 @@ export default function AdminAuditPage() {
 
   return (
     <AppShell>
+      <AuthGuard allowedRoles={['SUPER_ADMIN']}>
       {/* Top Header */}
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2.5">
         <div>
@@ -156,6 +158,7 @@ export default function AdminAuditPage() {
           </table>
         </div>
       </div>
+      </AuthGuard>
     </AppShell>
   );
 }

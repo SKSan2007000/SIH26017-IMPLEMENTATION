@@ -23,6 +23,7 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import { DemoFlag, GlassPanel, PanelHead, Button } from '@/components/ui/Primitives';
 import { MOCK_OFFICERS } from '@/lib/mock/officers';
 import { operationsApi } from '@/lib/api/operations';
@@ -383,9 +384,11 @@ function SupervisorDashboardContent() {
 export default function SupervisorDashboard() {
   return (
     <AppShell>
-      <Suspense fallback={<div className="p-8 text-center text-cyan animate-pulse">Loading Supervisor Dashboard...</div>}>
-        <SupervisorDashboardContent />
-      </Suspense>
+      <AuthGuard allowedRoles={['SUPERVISOR', 'SUPER_ADMIN']}>
+        <Suspense fallback={<div className="p-8 text-center text-cyan animate-pulse">Loading Supervisor Dashboard...</div>}>
+          <SupervisorDashboardContent />
+        </Suspense>
+      </AuthGuard>
     </AppShell>
   );
 }

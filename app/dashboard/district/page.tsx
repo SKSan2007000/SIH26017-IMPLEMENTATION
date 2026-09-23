@@ -18,6 +18,7 @@ import {
   Map,
 } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import { DemoFlag, GlassPanel, PanelHead, Button } from '@/components/ui/Primitives';
 import { useAppStore } from '@/lib/store/useAppStore';
 import { MOCK_PARCELS } from '@/lib/mock/parcels';
@@ -40,7 +41,8 @@ export default function DistrictOfficerDashboard() {
 
   return (
     <AppShell>
-      {/* Top Header */}
+      <AuthGuard allowedRoles={['DISTRICT_OFFICER', 'SUPER_ADMIN']}>
+        {/* Top Header */}
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2.5">
         <div>
           <div className="flex items-center gap-2">
@@ -247,6 +249,7 @@ export default function DistrictOfficerDashboard() {
           </GlassPanel>
         </div>
       </div>
+      </AuthGuard>
     </AppShell>
   );
 }

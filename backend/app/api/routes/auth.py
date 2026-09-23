@@ -18,9 +18,9 @@ from backend.app.schemas.user import (
     ResetPasswordRequest,
     AdminStatsResponse,
 )
-from backend.app.schemas.token import Token
+from backend.app.schemas.token import Token, UserAuthInfo
 from backend.app.core.security import verify_password, get_password_hash, create_access_token, UserRole
-from backend.app.api.deps import get_current_active_user, require_roles
+from backend.app.api.deps import get_current_active_user, require_roles, require_role
 
 logger = logging.getLogger("landguard.auth")
 
@@ -62,10 +62,12 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     if not user and clean_email in [
         "admin@landguard.ai",
         "admin@landguard.gov.in",
+        "projecthead@landguard.ai",
         "head@landguard.ai",
         "head@landguard.gov.in",
         "district@landguard.ai",
         "district@landguard.gov.in",
+        "acquisition@landguard.ai",
         "lao@landguard.ai",
         "lao@landguard.gov.in",
         "field@landguard.ai",
@@ -73,7 +75,11 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
         "supervisor@landguard.ai",
         "supervisor@landguard.gov.in",
         "citizen@landguard.ai",
+        "citizen@landguard.demo",
+        "citizen@landguard.gov.in",
         "contractor@landguard.ai",
+        "contractor@landguard.demo",
+        "contractor@landguard.gov.in",
     ]:
         try:
             from backend.app.db.seed import seed_database
@@ -97,6 +103,18 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
 
     token = create_access_token(subject=user.id, role=user.role)
     logger.info(f"User {user.email} (role: {user.role}) authenticated successfully")
+
+    user_info = UserAuthInfo(
+        id=user.id,
+        name=user.full_name,
+        email=user.email,
+        role=user.role,
+        designation=user.designation,
+        department=user.department,
+        district=user.district,
+        zone=user.zone,
+    )
+
     return Token(
         access_token=token,
         token_type="bearer",
@@ -104,13 +122,19 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
         user_id=user.id,
         email=user.email,
         full_name=user.full_name,
+        user=user_info,
     )
-
 
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user_profile(current_user: User = Depends(get_current_active_user)):
     return current_user
+
+
+@router.post("/logout")
+@router.get("/logout")
+def logout():
+    return {"status": "success", "message": "Logged out successfully"}
 
 
 @router.post("/register", response_model=UserResponse)
