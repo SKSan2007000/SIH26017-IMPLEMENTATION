@@ -83,6 +83,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: userProfile,
         token: res.accessToken,
         isLoading: false,
+        isInitialized: true,
         error: null,
       });
       return res;
@@ -106,6 +107,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user: userProfile,
       token: res.accessToken,
       isLoading: false,
+      isInitialized: true,
       error: null,
     });
     return res;
@@ -126,7 +128,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: () => {
     authApi.logout();
-    set({ user: null, token: null, error: null });
+    set({ user: null, token: null, isInitialized: true, error: null });
     if (typeof window !== 'undefined') {
       window.location.href = '/signin';
     }
@@ -140,36 +142,65 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return null;
     }
 
-    try {
-      const user = await authApi.getCurrentUser();
-      if (user) {
-        set({ user, token, isInitialized: true });
-        return user;
-      }
-    } catch {
-      // Backend request may have failed if backend is offline
-    }
-
-    // If backend is offline but cached session exists in localStorage, restore it!
+    // Step 1: Immediately restore cached user session from localStorage
+    let cachedProfile: UserProfile | null = null;
     const cached = localStorage.getItem('landguard_user');
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        const userProfile: UserProfile = {
-          id: parsed.userId || 'USR-DEMO',
-          email: parsed.email || 'demo@landguard.ai',
-          fullName: parsed.fullName || 'LandGuard User',
+        cachedProfile = {
+          id: parsed.userId || parsed.id || 'USR-LOGGED-IN',
+          email: parsed.email || '',
+          fullName: parsed.fullName || parsed.full_name || 'LandGuard User',
           role: parsed.role || 'SUPER_ADMIN',
+          designation: parsed.designation,
+          department: parsed.department,
+          district: parsed.district,
+          zone: parsed.zone,
           isActive: true,
         };
-        set({ user: userProfile, token, isInitialized: true });
-        return userProfile;
+        set({ user: cachedProfile, token, isInitialized: true });
       } catch {}
     }
 
-    // Token invalid or unauthenticated -> clear session
-    authApi.logout();
-    set({ user: null, token: null, isInitialized: true });
+    // Step 2: Validate/refresh session with live backend
+    try {
+      const liveUser = await authApi.getCurrentUser();
+      if (liveUser) {
+        set({ user: liveUser, token, isInitialized: true });
+        localStorage.setItem(
+          'landguard_user',
+          JSON.stringify({
+            accessToken: token,
+            tokenType: 'bearer',
+            role: liveUser.role,
+            userId: liveUser.id,
+            email: liveUser.email,
+            fullName: liveUser.fullName,
+            designation: liveUser.designation,
+            department: liveUser.department,
+            district: liveUser.district,
+            zone: liveUser.zone,
+          })
+        );
+        return liveUser;
+      }
+    } catch (err: any) {
+      if (err?.status === 401) {
+        authApi.logout();
+        set({ user: null, token: null, isInitialized: true });
+        return null;
+      }
+    }
+
+    // If live check returned null or non-401 error, keep the cached profile
+    if (cachedProfile) {
+      return cachedProfile;
+    }
+
+    const currentUser = get().user;
+    if (currentUser) return currentUser;
+
     return null;
   },
 

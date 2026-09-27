@@ -21,7 +21,13 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
   const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    initAuth().then((authUser) => {
+    let mounted = true;
+
+    const verify = async () => {
+      const authUser = (isInitialized && user) ? user : await initAuth();
+
+      if (!mounted) return;
+
       // If not logged in, redirect to /signin
       if (!authUser) {
         setAuthorized(false);
@@ -42,8 +48,14 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
       }
 
       setAuthorized(true);
-    });
-  }, [pathname, allowedRoles, initAuth, router]);
+    };
+
+    verify();
+
+    return () => {
+      mounted = false;
+    };
+  }, [pathname, allowedRoles, isInitialized, user, initAuth, router]);
 
   if (authorized === null) {
     return (

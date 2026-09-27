@@ -100,12 +100,19 @@ export function Topbar() {
 
   // Authenticate & session check
   useEffect(() => {
-    initAuth().then((authenticatedUser) => {
+    let active = true;
+    const checkSession = async () => {
+      const authenticatedUser = (isInitialized && user) ? user : await initAuth();
+      if (!active) return;
       if (!authenticatedUser && pathname !== '/' && pathname !== '/signin') {
         router.push('/signin');
       }
-    });
-  }, [pathname]);
+    };
+    checkSession();
+    return () => {
+      active = false;
+    };
+  }, [pathname, isInitialized, user, initAuth, router]);
 
   // Global search filtering
   const matchingProjects = search

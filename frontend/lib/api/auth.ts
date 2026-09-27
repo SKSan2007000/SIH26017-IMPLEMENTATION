@@ -64,24 +64,40 @@ export const authApi = {
   login: async (email: string, password: string): Promise<AuthTokenResponse> => {
     try {
       const res = await http.post<any>('/api/auth/login', { email, password });
-      if (res?.access_token && typeof window !== 'undefined') {
-        localStorage.setItem('landguard_token', res.access_token);
-        localStorage.setItem('landguard_user', JSON.stringify({
-          accessToken: res.access_token,
-          tokenType: res.token_type,
-          role: res.role,
-          userId: res.user_id,
-          email: res.email,
-          fullName: res.full_name,
-        }));
+      const accessToken = res?.access_token || res?.token || res?.accessToken;
+      const userObj = res?.user || {};
+      const role = res?.role || userObj.role || 'SUPER_ADMIN';
+      const userId = res?.user_id || userObj.id || res?.id || '';
+      const userEmail = res?.email || userObj.email || email;
+      const fullName = res?.full_name || userObj.name || userObj.full_name || 'LandGuard User';
+      const tokenType = res?.token_type || res?.tokenType || 'bearer';
+
+      if (accessToken && typeof window !== 'undefined') {
+        localStorage.setItem('landguard_token', accessToken);
+        localStorage.setItem(
+          'landguard_user',
+          JSON.stringify({
+            accessToken,
+            tokenType,
+            role,
+            userId,
+            email: userEmail,
+            fullName,
+            designation: userObj.designation || res?.designation,
+            department: userObj.department || res?.department,
+            district: userObj.district || res?.district,
+            zone: userObj.zone || res?.zone,
+          })
+        );
       }
+
       return {
-        accessToken: res.access_token,
-        tokenType: res.token_type,
-        role: res.role,
-        userId: res.user_id,
-        email: res.email,
-        fullName: res.full_name,
+        accessToken,
+        tokenType,
+        role,
+        userId,
+        email: userEmail,
+        fullName,
       };
     } catch (err) {
       throw err;
@@ -161,11 +177,12 @@ export const authApi = {
 
   getCurrentUser: async (): Promise<UserProfile | null> => {
     try {
-      const res = await http.get<any>('/api/v1/auth/me');
+      const res = await http.get<any>('/api/auth/me');
+      if (!res) return null;
       return {
-        id: res.id,
+        id: res.id || res.user_id,
         email: res.email,
-        fullName: res.full_name,
+        fullName: res.full_name || res.name || res.fullName || 'LandGuard User',
         role: res.role,
         designation: res.designation,
         department: res.department,
@@ -173,11 +190,11 @@ export const authApi = {
         district: res.district,
         zone: res.zone,
         address: res.address,
-        isActive: res.is_active,
+        isActive: res.is_active ?? true,
       };
-    } catch {
-      // Clear invalid credentials if request fails
-      if (typeof window !== 'undefined') {
+    } catch (err: any) {
+      // Only clear if explicitly 401 Unauthorized
+      if (err?.status === 401 && typeof window !== 'undefined') {
         localStorage.removeItem('landguard_token');
         localStorage.removeItem('landguard_user');
       }
