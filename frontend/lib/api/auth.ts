@@ -63,7 +63,7 @@ export async function checkBackendHealth(): Promise<{ isOnline: boolean; url: st
 export const authApi = {
   login: async (email: string, password: string): Promise<AuthTokenResponse> => {
     try {
-      const res = await http.post<any>('/api/v1/auth/login', { email, password });
+      const res = await http.post<any>('/api/auth/login', { email, password });
       if (res?.access_token && typeof window !== 'undefined') {
         localStorage.setItem('landguard_token', res.access_token);
         localStorage.setItem('landguard_user', JSON.stringify({
