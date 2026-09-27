@@ -55,7 +55,14 @@ export function normalizePath(base: string, path: string): string {
   let cleanBase = (base || '').trim().replace(/\/+$/, '');
   let cleanPath = path.startsWith('/') ? path : `/${path}`;
 
-  // If base does not contain /api and cleanPath does not start with /api or root endpoints (/health, /docs), route via /api/v1
+  // Normalize /api/v1/ prefix to /api/ matching Railway backend route registration
+  if (cleanPath.startsWith('/api/v1/')) {
+    cleanPath = `/api/${cleanPath.substring(8)}`;
+  } else if (cleanPath === '/api/v1') {
+    cleanPath = '/api';
+  }
+
+  // If base does not contain /api and cleanPath does not start with /api or root endpoints (/health, /docs), route via /api
   if (
     !cleanBase.includes('/api') &&
     !cleanPath.startsWith('/api') &&
@@ -64,20 +71,20 @@ export function normalizePath(base: string, path: string): string {
     !cleanPath.startsWith('/redoc') &&
     !cleanPath.startsWith('/openapi.json')
   ) {
-    cleanPath = `/api/v1${cleanPath}`;
+    cleanPath = `/api${cleanPath}`;
   }
 
-  // If base already ends with /api/v1 and path starts with /api/v1, don't duplicate
-  if (cleanBase.endsWith('/api/v1') && cleanPath.startsWith('/api/v1')) {
-    return `${cleanBase}${cleanPath.substring(7)}`;
-  }
-  // If base ends with /api/v1 and path starts with /api (e.g. /api/auth/login), strip /v1 from base
-  if (cleanBase.endsWith('/api/v1') && cleanPath.startsWith('/api')) {
-    return `${cleanBase.slice(0, -3)}${cleanPath.substring(4)}`;
-  }
   // If base ends with /api and path starts with /api, don't duplicate
   if (cleanBase.endsWith('/api') && cleanPath.startsWith('/api')) {
     return `${cleanBase}${cleanPath.substring(4)}`;
+  }
+
+  // If base ends with /api/v1, strip /v1
+  if (cleanBase.endsWith('/api/v1')) {
+    cleanBase = cleanBase.slice(0, -3);
+    if (cleanPath.startsWith('/api')) {
+      return `${cleanBase}${cleanPath.substring(4)}`;
+    }
   }
 
   return `${cleanBase}${cleanPath}`;

@@ -159,7 +159,7 @@ export const authApi = {
       address: data.address,
       is_active: true,
     };
-    const res = await http.post<any>('/api/v1/auth/register', payload);
+    const res = await http.post<any>('/api/auth/register', payload);
     return {
       id: res.id,
       email: res.email,
@@ -208,7 +208,7 @@ export const authApi = {
       if (params?.search) query.append('search', params.search);
       if (params?.role && params.role !== 'all') query.append('role', params.role);
       if (params?.status && params.status !== 'all') query.append('status', params.status);
-      const url = `/api/v1/auth/users${query.toString() ? `?${query.toString()}` : ''}`;
+      const url = `/api/auth/users${query.toString() ? `?${query.toString()}` : ''}`;
       const res = await http.get<any[]>(url);
       return res.map((u) => ({
         id: u.id,
@@ -264,7 +264,7 @@ export const authApi = {
       address: data.address,
       is_active: data.isActive ?? true,
     };
-    const res = await http.post<any>('/api/v1/auth/users', payload);
+    const res = await http.post<any>('/api/auth/users', payload);
     return {
       id: res.id,
       email: res.email,
@@ -307,7 +307,7 @@ export const authApi = {
     if (data.isActive !== undefined) payload.is_active = data.isActive;
     if (data.password) payload.password = data.password;
 
-    const res = await http.patch<any>(`/api/v1/auth/users/${userId}`, payload);
+    const res = await http.patch<any>(`/api/auth/users/${userId}`, payload);
     return {
       id: res.id,
       email: res.email,
@@ -324,16 +324,16 @@ export const authApi = {
   },
 
   resetPassword: async (userId: string, newPassword: string): Promise<{ status: string; message: string }> => {
-    return http.post<{ status: string; message: string }>(`/api/v1/auth/users/${userId}/reset-password`, { new_password: newPassword });
+    return http.post<{ status: string; message: string }>(`/api/auth/users/${userId}/reset-password`, { new_password: newPassword });
   },
 
   deleteUser: async (userId: string): Promise<{ status: string; message: string }> => {
-    return http.delete<{ status: string; message: string }>(`/api/v1/auth/users/${userId}`);
+    return http.delete<{ status: string; message: string }>(`/api/auth/users/${userId}`);
   },
 
   getAdminStats: async (): Promise<AdminStats> => {
     try {
-      return await http.get<AdminStats>('/api/v1/auth/admin-stats');
+      return await http.get<AdminStats>('/api/auth/admin-stats');
     } catch {
       return {
         total_users: 8,
@@ -350,7 +350,7 @@ export const authApi = {
 
   logout: () => {
     try {
-      http.post('/api/v1/auth/logout', {}).catch(() => {});
+      http.post('/api/auth/logout', {}).catch(() => {});
     } catch {}
     if (typeof window !== 'undefined') {
       localStorage.removeItem('landguard_token');
