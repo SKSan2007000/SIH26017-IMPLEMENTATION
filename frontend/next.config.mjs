@@ -1,30 +1,3 @@
-import CopyWebpackPlugin from 'copy-webpack-plugin';
-
-/**
- * CesiumJS ships its Workers/ThirdParty/Assets/Widgets as static files that
- * are NOT bundled by webpack — they must be copied into /public and loaded
- * at runtime via a global CESIUM_BASE_URL. This is the standard integration
- * pattern for Cesium + Next.js/webpack (see cesium/cesium#9264 and the
- * official "Uploading" / bundler guides).
- *
- * NOTE: this repo could not be `npm install`-ed or `next build`-ed inside
- * the sandbox that generated it (no network egress to the npm registry).
- * The config below is written to the known-correct pattern for
- * cesium ^1.120 + next 14, but has not been build-verified here — verify
- * with `npm run build` in an environment with network access, and open an
- * issue against this file if the copy source paths have moved in a future
- * Cesium release.
- */
-const cesiumSource = 'node_modules/cesium/Build/Cesium';
-
-const rawTarget = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sih26017-implementation-production.up.railway.app';
-let backendTarget = rawTarget.replace(/\/+$/, '');
-if (backendTarget.endsWith('/api/v1')) {
-  backendTarget = backendTarget.slice(0, -7);
-} else if (backendTarget.endsWith('/api')) {
-  backendTarget = backendTarget.slice(0, -4);
-}
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -38,34 +11,6 @@ const nextConfig = {
       );
     }
     return config;
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/backend/:path*',
-        destination: `${backendTarget}/api/backend/:path*`,
-      },
-      {
-        source: '/api/:path*',
-        destination: `${backendTarget}/api/:path*`,
-      },
-      {
-        source: '/health',
-        destination: `${backendTarget}/health`,
-      },
-      {
-        source: '/docs',
-        destination: `${backendTarget}/docs`,
-      },
-      {
-        source: '/openapi.json',
-        destination: `${backendTarget}/openapi.json`,
-      },
-      {
-        source: '/uploads/:path*',
-        destination: `${backendTarget}/uploads/:path*`,
-      },
-    ];
   },
 };
 
