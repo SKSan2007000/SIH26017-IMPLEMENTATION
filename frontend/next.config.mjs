@@ -17,7 +17,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
  */
 const cesiumSource = 'node_modules/cesium/Build/Cesium';
 
-const rawTarget = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000';
+const rawTarget = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sih26017-implementation-production.up.railway.app';
 let backendTarget = rawTarget.replace(/\/+$/, '');
 if (backendTarget.endsWith('/api/v1')) {
   backendTarget = backendTarget.slice(0, -7);

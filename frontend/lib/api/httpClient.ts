@@ -7,29 +7,22 @@
 
 let customApiBaseUrl: string | null = null;
 
+export const DEFAULT_RAILWAY_BACKEND_URL = 'https://sih26017-implementation-production.up.railway.app';
+
 export function getApiBaseUrl(): string {
-  if (customApiBaseUrl !== null) {
-    return customApiBaseUrl;
+  if (customApiBaseUrl !== null && customApiBaseUrl.trim() !== '') {
+    return customApiBaseUrl.trim().replace(/\/+$/, '');
   }
-  if (process.env.NEXT_PUBLIC_API_BASE_URL !== undefined && process.env.NEXT_PUBLIC_API_BASE_URL !== '') {
-    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (process.env.NEXT_PUBLIC_API_URL !== undefined && process.env.NEXT_PUBLIC_API_URL.trim() !== '') {
+    return process.env.NEXT_PUBLIC_API_URL.trim().replace(/\/+$/, '');
   }
-  if (process.env.NEXT_PUBLIC_API_URL !== undefined && process.env.NEXT_PUBLIC_API_URL !== '') {
-    return process.env.NEXT_PUBLIC_API_URL;
+  if (process.env.NEXT_PUBLIC_API_BASE_URL !== undefined && process.env.NEXT_PUBLIC_API_BASE_URL.trim() !== '') {
+    return process.env.NEXT_PUBLIC_API_BASE_URL.trim().replace(/\/+$/, '');
   }
-  if (process.env.VITE_API_URL !== undefined && process.env.VITE_API_URL !== '') {
-    return process.env.VITE_API_URL;
+  if (process.env.VITE_API_URL !== undefined && process.env.VITE_API_URL.trim() !== '') {
+    return process.env.VITE_API_URL.trim().replace(/\/+$/, '');
   }
-  // Client-side execution in browser
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    if (host !== 'localhost' && host !== '127.0.0.1') {
-      // Production deployment on Vercel / custom domain uses same-origin relative paths
-      return '';
-    }
-  }
-  // Local development fallback
-  return 'http://127.0.0.1:8000';
+  return DEFAULT_RAILWAY_BACKEND_URL;
 }
 
 export function setApiBaseUrl(url: string) {
@@ -59,7 +52,7 @@ function getAuthToken(): string | null {
 }
 
 export function normalizePath(base: string, path: string): string {
-  let cleanBase = (base || '').replace(/\/+$/, '');
+  let cleanBase = (base || '').trim().replace(/\/+$/, '');
   let cleanPath = path.startsWith('/') ? path : `/${path}`;
 
   // If base does not contain /api and cleanPath does not start with /api or root endpoints (/health, /docs), route via /api/v1
@@ -77,6 +70,10 @@ export function normalizePath(base: string, path: string): string {
   // If base already ends with /api/v1 and path starts with /api/v1, don't duplicate
   if (cleanBase.endsWith('/api/v1') && cleanPath.startsWith('/api/v1')) {
     return `${cleanBase}${cleanPath.substring(7)}`;
+  }
+  // If base ends with /api/v1 and path starts with /api (e.g. /api/auth/login), strip /v1 from base
+  if (cleanBase.endsWith('/api/v1') && cleanPath.startsWith('/api')) {
+    return `${cleanBase.slice(0, -3)}${cleanPath.substring(4)}`;
   }
   // If base ends with /api and path starts with /api, don't duplicate
   if (cleanBase.endsWith('/api') && cleanPath.startsWith('/api')) {
