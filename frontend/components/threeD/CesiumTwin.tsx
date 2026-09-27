@@ -38,7 +38,18 @@ import clsx from 'clsx';
 
 type CesiumModule = typeof import('cesium');
 
+function ensureCesiumCss() {
+  if (typeof document === 'undefined') return;
+  if (!document.querySelector('link[href*="widgets.css"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/cesium/Widgets/widgets.css';
+    document.head.appendChild(link);
+  }
+}
+
 async function loadCesiumModule(): Promise<CesiumModule> {
+  ensureCesiumCss();
   if (typeof window !== 'undefined' && (window as any).Cesium) {
     return (window as any).Cesium as CesiumModule;
   }
