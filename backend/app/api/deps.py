@@ -4,10 +4,10 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
-from backend.app.core.config import settings
-from backend.app.core.security import UserRole
-from backend.app.db.database import get_db
-from backend.app.db.models.user import User
+from app.core.config import settings
+from app.core.security import UserRole
+from app.db.database import get_db
+from app.db.models.user import User
 
 security_scheme = HTTPBearer(auto_error=False)
 

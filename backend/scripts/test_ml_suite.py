@@ -13,25 +13,25 @@ import numpy as np
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from fastapi.testclient import TestClient
-from backend.app.main import app
-from backend.app.ml.dataset import generate_historical_dataset
-from backend.app.ml.preprocess import (
+from app.main import app
+from app.ml.dataset import generate_historical_dataset
+from app.ml.preprocess import (
     create_preprocessor_pipeline,
     prepare_features_for_inference,
     NUMERICAL_FEATURES,
     CATEGORICAL_FEATURES,
     ALL_FEATURE_COLUMNS,
 )
-from backend.app.ml.train import train_and_evaluate_models, get_model_storage_dir
-from backend.app.ml.predict import predict_project_risk, get_or_load_models
-from backend.app.ml.explain import compute_feature_contributions
-from backend.app.ml.recommend import generate_risk_recommendations
-from backend.app.ml.simulate import simulate_what_if_interventions, simulate_combined_what_if
-from backend.app.ml.route_eval import evaluate_route_candidate_risk, evaluate_and_rank_routes
-from backend.app.db.database import SessionLocal
-from backend.app.db.models.project import Project
-from backend.app.db.models.risk import RiskPrediction, RiskFactor
-from backend.app.services.risk_service import recalculate_and_persist_project_risk
+from app.ml.train import train_and_evaluate_models, get_model_storage_dir
+from app.ml.predict import predict_project_risk, get_or_load_models
+from app.ml.explain import compute_feature_contributions
+from app.ml.recommend import generate_risk_recommendations
+from app.ml.simulate import simulate_what_if_interventions, simulate_combined_what_if
+from app.ml.route_eval import evaluate_route_candidate_risk, evaluate_and_rank_routes
+from app.db.database import SessionLocal
+from app.db.models.project import Project
+from app.db.models.risk import RiskPrediction, RiskFactor
+from app.services.risk_service import recalculate_and_persist_project_risk
 
 client = TestClient(app)
 

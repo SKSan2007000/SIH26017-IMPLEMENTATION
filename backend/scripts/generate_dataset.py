@@ -9,7 +9,7 @@ import argparse
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from backend.app.ml.dataset import generate_historical_dataset
+from app.ml.dataset import generate_historical_dataset
 
 
 def main():

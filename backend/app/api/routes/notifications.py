@@ -3,9 +3,9 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 import uuid
-from backend.app.db.database import get_db
-from backend.app.db.models.notification import Notification
-from backend.app.schemas.notification import NotificationCreate
+from app.db.database import get_db
+from app.db.models.notification import Notification
+from app.schemas.notification import NotificationCreate
 
 router = APIRouter()
 

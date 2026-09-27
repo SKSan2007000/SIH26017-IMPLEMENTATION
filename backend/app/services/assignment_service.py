@@ -18,10 +18,10 @@ from typing import Dict, Any, Optional, List, Tuple
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from backend.app.db.models.officer_performance import OfficerProfile
-from backend.app.db.models.field_verification import FieldVerification
-from backend.app.db.models.notification import Notification
-from backend.app.db.models.audit import AuditLog
+from app.db.models.officer_performance import OfficerProfile
+from app.db.models.field_verification import FieldVerification
+from app.db.models.notification import Notification
+from app.db.models.audit import AuditLog
 
 
 ROLE_TASK_MAPPING: Dict[str, List[str]] = {
@@ -526,8 +526,8 @@ def get_officers_workload_status(
 
 
 def find_best_project_head(db: Session, district: Optional[str] = None, state: Optional[str] = None) -> Tuple[Any, str, Dict[str, float]]:
-    from backend.app.db.models.user import User
-    from backend.app.db.models.design import ProjectAssignment
+    from app.db.models.user import User
+    from app.db.models.design import ProjectAssignment
 
     candidates = db.query(User).filter(User.role == "PROJECT_HEAD", User.is_active == True).all()
     if not candidates:
@@ -575,8 +575,8 @@ def find_best_project_head(db: Session, district: Optional[str] = None, state: O
 
 
 def find_best_district_officer(db: Session, district: Optional[str] = None, state: Optional[str] = None) -> Tuple[Any, str, Dict[str, float]]:
-    from backend.app.db.models.user import User
-    from backend.app.db.models.design import ProjectAssignment
+    from app.db.models.user import User
+    from app.db.models.design import ProjectAssignment
 
     candidates = db.query(User).filter(User.role == "DISTRICT_OFFICER", User.is_active == True).all()
     if not candidates:
@@ -622,8 +622,8 @@ def find_best_district_officer(db: Session, district: Optional[str] = None, stat
 
 
 def find_best_contractor(db: Session, project_type: Optional[str] = None, district: Optional[str] = None) -> Tuple[Any, str, Dict[str, float]]:
-    from backend.app.db.models.user import User
-    from backend.app.db.models.contractor import ContractorWorkPackage
+    from app.db.models.user import User
+    from app.db.models.contractor import ContractorWorkPackage
 
     candidates = db.query(User).filter(User.role == "CONTRACTOR", User.is_active == True).all()
     if not candidates:
@@ -681,9 +681,9 @@ def assign_project_officers_automatically(
     Persists assignments to project_assignments table, updates Project record,
     emits notifications, and writes SHA-256 audit logs.
     """
-    from backend.app.db.models.project import Project
-    from backend.app.db.models.design import ProjectAssignment
-    from backend.app.services.audit_service import log_audit_event
+    from app.db.models.project import Project
+    from app.db.models.design import ProjectAssignment
+    from app.services.audit_service import log_audit_event
 
     project = db.query(Project).filter(Project.id == project_id).first()
     proj_name = project.name if project else project_id
@@ -963,8 +963,8 @@ def assign_project_officers_automatically(
 
 def get_project_team_details(db: Session, project_id: str) -> Dict[str, Any]:
     """Returns current project team assignments and member profiles."""
-    from backend.app.db.models.design import ProjectAssignment
-    from backend.app.db.models.project import Project
+    from app.db.models.design import ProjectAssignment
+    from app.db.models.project import Project
 
     project = db.query(Project).filter(Project.id == project_id).first()
     assignments = db.query(ProjectAssignment).filter(

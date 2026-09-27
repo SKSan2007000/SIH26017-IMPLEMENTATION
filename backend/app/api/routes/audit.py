@@ -3,9 +3,9 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import uuid
-from backend.app.db.database import get_db
-from backend.app.db.models.audit import AuditLog
-from backend.app.schemas.audit import AuditLogCreate
+from app.db.database import get_db
+from app.db.models.audit import AuditLog
+from app.schemas.audit import AuditLogCreate
 
 router = APIRouter()
 

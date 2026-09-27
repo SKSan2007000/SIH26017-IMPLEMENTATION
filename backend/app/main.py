@@ -13,11 +13,11 @@ for p in [root_dir, backend_dir, app_dir]:
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from backend.app.core.config import settings
-from backend.app.db.database import engine, Base, SessionLocal, init_db
-import backend.app.db.models  # load all models
-from backend.app.db.seed import seed_database
-from backend.app.api.routes import api_router
+from app.core.config import settings
+from app.db.database import engine, Base, SessionLocal, init_db
+import app.db.models  # load all models
+from app.db.seed import seed_database
+from app.api.routes import api_router
 
 
 @asynccontextmanager
@@ -49,6 +49,7 @@ origins = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://sih-26017-implementation-cgq5.vercel.app",
 ]
 if isinstance(settings.BACKEND_CORS_ORIGINS, list):
     for o in settings.BACKEND_CORS_ORIGINS:
@@ -58,13 +59,24 @@ if isinstance(settings.BACKEND_CORS_ORIGINS, list):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins if origins else ["*"],
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:[0-9]+)?|https://.*\.vercel\.app",
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:[0-9]+)?|https://.*\.vercel\.app|https://.*\.railway\.app|https://.*\.up\.railway\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=86400,
 )
+
+
+@app.get("/", tags=["System Health"])
+def root():
+    return {
+        "status": "ok",
+        "service": "LandGuard API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/health",
+    }
 
 
 @app.get("/health", tags=["System Health"])
@@ -110,4 +122,4 @@ async def preflight_handler(rest_of_path: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

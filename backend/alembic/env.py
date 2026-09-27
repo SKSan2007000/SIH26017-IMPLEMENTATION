@@ -12,9 +12,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 # Import settings and Base
-from backend.app.core.config import settings
-from backend.app.db.database import Base
-import backend.app.db.models  # load all models
+from app.core.config import settings
+from app.db.database import Base
+import app.db.models  # load all models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

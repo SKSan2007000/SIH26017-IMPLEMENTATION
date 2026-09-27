@@ -2,14 +2,14 @@ from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from backend.app.db.database import get_db
-from backend.app.schemas.operational import (
+from app.db.database import get_db
+from app.schemas.operational import (
     ProjectStateTransitionRequest,
     ProjectStateTransitionResponse,
     ParcelWorkflowUpdateRequest,
     ParcelWorkflowUpdateResponse,
 )
-from backend.app.services.workflow_service import (
+from app.services.workflow_service import (
     transition_project_state,
     update_parcel_workflow_status,
     calculate_project_actual_progress,

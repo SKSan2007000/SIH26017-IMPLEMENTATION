@@ -6,8 +6,8 @@ from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from backend.app.db.database import get_db
-from backend.app.schemas.portfolio import (
+from app.db.database import get_db
+from app.schemas.portfolio import (
     PortfolioSummaryResponse,
     OfficerCrossProjectWorkloadResponse,
     ContractorProjectView,
@@ -15,14 +15,14 @@ from backend.app.schemas.portfolio import (
     ProjectAssignmentResponse,
     ConnectivityGapResponse,
 )
-from backend.app.services.portfolio_service import (
+from app.services.portfolio_service import (
     get_portfolio_summary,
     get_officer_cross_project_workload,
     get_contractor_projects,
     assign_user_to_project,
 )
-from backend.app.services.network_service import get_regional_road_network
-from backend.app.db.models.design import ProjectAssignment
+from app.services.network_service import get_regional_road_network
+from app.db.models.design import ProjectAssignment
 
 router = APIRouter(prefix="/portfolio", tags=["Multi-Project Portfolio & Workload Management"])
 

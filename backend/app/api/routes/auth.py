@@ -3,14 +3,14 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
 from sqlalchemy.orm import Session
 import uuid
-from backend.app.db.database import get_db, init_db, engine
-from backend.app.db.models.user import User
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.field_verification import FieldVerification
-from backend.app.db.models.notification import Notification
-from backend.app.db.models.citizen_report import CitizenReport
-from backend.app.schemas.user import (
+from app.db.database import get_db, init_db, engine
+from app.db.models.user import User
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.field_verification import FieldVerification
+from app.db.models.notification import Notification
+from app.db.models.citizen_report import CitizenReport
+from app.schemas.user import (
     UserCreate,
     UserUpdate,
     UserResponse,
@@ -18,9 +18,9 @@ from backend.app.schemas.user import (
     ResetPasswordRequest,
     AdminStatsResponse,
 )
-from backend.app.schemas.token import Token, UserAuthInfo
-from backend.app.core.security import verify_password, get_password_hash, create_access_token, UserRole
-from backend.app.api.deps import get_current_active_user, require_roles, require_role
+from app.schemas.token import Token, UserAuthInfo
+from app.core.security import verify_password, get_password_hash, create_access_token, UserRole
+from app.api.deps import get_current_active_user, require_roles, require_role
 
 logger = logging.getLogger("landguard.auth")
 
@@ -82,7 +82,7 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
         "contractor@landguard.gov.in",
     ]:
         try:
-            from backend.app.db.seed import seed_database
+            from app.db.seed import seed_database
             logger.info(f"Demo user {clean_email} missing. Seeding database...")
             seed_database(db, force=False)
             user = db.query(User).filter(User.email == clean_email).first()
@@ -236,7 +236,7 @@ def admin_create_user(
     db.flush()
 
     # If created user is an operational staff officer, sync/create OfficerProfile for auto-allocation
-    from backend.app.db.models.officer_performance import OfficerProfile
+    from app.db.models.officer_performance import OfficerProfile
     if role_val in [
         UserRole.FIELD_OFFICER.value,
         UserRole.LAND_ACQUISITION_OFFICER.value,
@@ -310,7 +310,7 @@ def admin_update_user(
         user.hashed_password = get_password_hash(user_in.password)
 
     # Sync corresponding OfficerProfile if present
-    from backend.app.db.models.officer_performance import OfficerProfile
+    from app.db.models.officer_performance import OfficerProfile
     prof = db.query(OfficerProfile).filter(
         (OfficerProfile.user_id == user.id) | (OfficerProfile.name == user.full_name)
     ).first()

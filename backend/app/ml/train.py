@@ -25,8 +25,8 @@ from sklearn.metrics import (
     r2_score,
 )
 
-from backend.app.ml.dataset import generate_historical_dataset
-from backend.app.ml.preprocess import (
+from app.ml.dataset import generate_historical_dataset
+from app.ml.preprocess import (
     create_preprocessor_pipeline,
     ALL_FEATURE_COLUMNS,
     NUMERICAL_FEATURES,

@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 import uuid
-from backend.app.db.models.audit import AuditLog
+from app.db.models.audit import AuditLog
 
 
 def log_audit_event(

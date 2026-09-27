@@ -10,10 +10,10 @@ from typing import Dict, Any, List, Optional, Tuple
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.audit import AuditLog
-from backend.app.db.models.notification import Notification
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.audit import AuditLog
+from app.db.models.notification import Notification
 
 
 PROJECT_WORKFLOW_STATES: List[str] = [

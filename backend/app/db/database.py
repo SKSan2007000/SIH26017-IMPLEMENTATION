@@ -4,7 +4,7 @@ import logging
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from backend.app.core.config import settings
+from app.core.config import settings
 
 logger = logging.getLogger("landguard.db")
 
@@ -98,6 +98,12 @@ def ensure_schema_migrations(eng=None):
             if "parcels" in tables:
                 cols = [c["name"] for c in inspector.get_columns("parcels")]
                 new_parcel_cols = [
+                    ("workflow_status", "VARCHAR DEFAULT 'IDENTIFIED'"),
+                    ("response_status", "VARCHAR DEFAULT 'PENDING'"),
+                    ("notification_status", "VARCHAR DEFAULT 'NOT SENT'"),
+                    ("verification", "VARCHAR DEFAULT 'PENDING'"),
+                    ("acquisition_status", "VARCHAR DEFAULT 'NOT STARTED'"),
+                    ("polygon_coords", "JSON"),
                     ("structures_present", "BOOLEAN DEFAULT 0"),
                     ("structure_type", "VARCHAR"),
                     ("disputed", "BOOLEAN DEFAULT 0"),
@@ -186,13 +192,13 @@ def init_db(target_engine=None):
     eng = target_engine or engine
     try:
         # Import all models to register them with Base.metadata
-        import backend.app.db.models  # noqa: F401
+        import app.db.models  # noqa: F401
         Base.metadata.create_all(bind=eng)
         ensure_schema_migrations(eng)
         
         # Verify demo user presence
-        from backend.app.db.models.user import User
-        from backend.app.db.seed import seed_database
+        from app.db.models.user import User
+        from app.db.seed import seed_database
         
         db = SessionLocal()
         try:

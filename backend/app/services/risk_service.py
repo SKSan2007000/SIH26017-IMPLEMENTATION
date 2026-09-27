@@ -8,16 +8,16 @@ from typing import List, Dict, Any, Optional
 import math
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.stakeholder import Stakeholder
-from backend.app.db.models.document import Document
-from backend.app.db.models.field_verification import FieldVerification
-from backend.app.db.models.citizen_report import CitizenReport
-from backend.app.db.models.risk import RiskPrediction, RiskFactor
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.stakeholder import Stakeholder
+from app.db.models.document import Document
+from app.db.models.field_verification import FieldVerification
+from app.db.models.citizen_report import CitizenReport
+from app.db.models.risk import RiskPrediction, RiskFactor
 
-from backend.app.ml.predict import predict_project_risk
-from backend.app.ml.simulate import simulate_what_if_interventions
+from app.ml.predict import predict_project_risk
+from app.ml.simulate import simulate_what_if_interventions
 
 
 def extract_project_risk_features(db: Session, project_id: str) -> Dict[str, Any]:

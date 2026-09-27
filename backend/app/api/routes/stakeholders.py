@@ -2,11 +2,11 @@ from typing import List, Optional, Any, Dict
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import uuid
-from backend.app.db.database import get_db
-from backend.app.db.models.stakeholder import Stakeholder
-from backend.app.db.models.document import Document
-from backend.app.schemas.stakeholder import StakeholderCreate, StakeholderUpdate
-from backend.app.services.audit_service import log_audit_event
+from app.db.database import get_db
+from app.db.models.stakeholder import Stakeholder
+from app.db.models.document import Document
+from app.schemas.stakeholder import StakeholderCreate, StakeholderUpdate
+from app.services.audit_service import log_audit_event
 
 router = APIRouter()
 

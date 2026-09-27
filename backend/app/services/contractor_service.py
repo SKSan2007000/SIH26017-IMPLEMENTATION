@@ -10,10 +10,10 @@ from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from backend.app.db.models.contractor import ContractorWorkPackage, ContractorProgressLog
-from backend.app.db.models.project import Project
-from backend.app.db.models.notification import Notification
-from backend.app.db.models.audit import AuditLog
+from app.db.models.contractor import ContractorWorkPackage, ContractorProgressLog
+from app.db.models.project import Project
+from app.db.models.notification import Notification
+from app.db.models.audit import AuditLog
 
 
 def create_work_package(

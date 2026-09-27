@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Text, JSON
-from backend.app.db.database import Base
+from app.db.database import Base
 
 
 class ContractorWorkPackage(Base):

@@ -16,12 +16,12 @@ Validates:
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-from backend.app.main import app
-from backend.app.db.database import SessionLocal, Base, engine
-from backend.app.db.seed import seed_database
-from backend.app.db.models.design import Design, DesignVersion, DesignChangeRequest, DesignPackage, ProjectAssignment
-from backend.app.db.models.project import Project
-from backend.app.services.design_service import (
+from app.main import app
+from app.db.database import SessionLocal, Base, engine
+from app.db.seed import seed_database
+from app.db.models.design import Design, DesignVersion, DesignChangeRequest, DesignPackage, ProjectAssignment
+from app.db.models.project import Project
+from app.services.design_service import (
     generate_ai_designs,
     recalculate_design_metrics,
     create_design_version,
@@ -30,13 +30,13 @@ from backend.app.services.design_service import (
     create_design_change_request,
     review_design_change_request,
 )
-from backend.app.services.portfolio_service import (
+from app.services.portfolio_service import (
     get_portfolio_summary,
     get_officer_cross_project_workload,
     get_contractor_projects,
     assign_user_to_project,
 )
-from backend.app.services.network_service import get_regional_road_network
+from app.services.network_service import get_regional_road_network
 
 client = TestClient(app)
 

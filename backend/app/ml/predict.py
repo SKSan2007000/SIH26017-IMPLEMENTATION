@@ -11,13 +11,13 @@ from typing import Dict, Any, Optional
 import numpy as np
 import pandas as pd
 
-from backend.app.ml.preprocess import (
+from app.ml.preprocess import (
     prepare_features_for_inference,
     ALL_FEATURE_COLUMNS,
 )
-from backend.app.ml.explain import compute_feature_contributions
-from backend.app.ml.recommend import generate_risk_recommendations
-from backend.app.ml.train import train_and_evaluate_models
+from app.ml.explain import compute_feature_contributions
+from app.ml.recommend import generate_risk_recommendations
+from app.ml.train import train_and_evaluate_models
 
 
 # Global model cache to avoid disk I/O on every API request

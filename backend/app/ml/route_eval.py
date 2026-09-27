@@ -5,7 +5,7 @@ to assess delay probability, cost impact, and identify the optimal trade-off ali
 """
 
 from typing import Dict, Any, List
-from backend.app.ml.predict import predict_project_risk
+from app.ml.predict import predict_project_risk
 
 
 def evaluate_route_candidate_risk(

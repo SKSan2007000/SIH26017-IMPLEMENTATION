@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import uuid
 from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, ForeignKey, JSON, Text
 from sqlalchemy.orm import relationship
-from backend.app.db.database import Base
+from app.db.database import Base
 
 
 class Design(Base):

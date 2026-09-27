@@ -12,20 +12,20 @@ from typing import List, Optional, Any, Dict
 import math
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from backend.app.db.database import get_db
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.route import Route
-from backend.app.db.models.stakeholder import Stakeholder
-from backend.app.db.models.field_verification import FieldVerification
-from backend.app.db.models.risk import RiskPrediction
-from backend.app.db.models.officer_performance import OfficerProfile
-from backend.app.services.spatial_service import (
+from app.db.database import get_db
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.route import Route
+from app.db.models.stakeholder import Stakeholder
+from app.db.models.field_verification import FieldVerification
+from app.db.models.risk import RiskPrediction
+from app.db.models.officer_performance import OfficerProfile
+from app.services.spatial_service import (
     compute_affected_parcels_for_route,
     meters_to_degrees_approx,
 )
-from backend.app.services.risk_service import recalculate_and_persist_project_risk
-from backend.app.services.audit_service import log_audit_event
+from app.services.risk_service import recalculate_and_persist_project_risk
+from app.services.audit_service import log_audit_event
 
 router = APIRouter()
 

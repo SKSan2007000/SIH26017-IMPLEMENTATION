@@ -8,14 +8,14 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.field_verification import FieldVerification
-from backend.app.db.models.document import Document
-from backend.app.db.models.citizen_report import CitizenReport
-from backend.app.db.models.risk import RiskPrediction
-from backend.app.db.models.officer_performance import OfficerProfile
-from backend.app.db.models.contractor import ContractorWorkPackage
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.field_verification import FieldVerification
+from app.db.models.document import Document
+from app.db.models.citizen_report import CitizenReport
+from app.db.models.risk import RiskPrediction
+from app.db.models.officer_performance import OfficerProfile
+from app.db.models.contractor import ContractorWorkPackage
 
 
 def get_todays_operations_queue(db: Session, project_id: Optional[str] = None) -> Dict[str, Any]:

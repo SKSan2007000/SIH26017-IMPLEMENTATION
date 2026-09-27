@@ -6,16 +6,16 @@ Exposes project delay risk, explainability, drivers, recommendations, and what-i
 from typing import List, Optional, Any, Dict
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from backend.app.db.database import get_db
-from backend.app.db.models.project import Project
-from backend.app.db.models.risk import RiskPrediction, RiskFactor
-from backend.app.schemas.risk import WhatIfRequest
-from backend.app.services.risk_service import (
+from app.db.database import get_db
+from app.db.models.project import Project
+from app.db.models.risk import RiskPrediction, RiskFactor
+from app.schemas.risk import WhatIfRequest
+from app.services.risk_service import (
     recalculate_and_persist_project_risk,
     simulate_what_if_policy_interventions,
     extract_project_risk_features,
 )
-from backend.app.services.audit_service import log_audit_event
+from app.services.audit_service import log_audit_event
 
 router = APIRouter()
 

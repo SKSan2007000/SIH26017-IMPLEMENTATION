@@ -3,10 +3,10 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import uuid
-from backend.app.db.database import get_db
-from backend.app.db.models.citizen_report import CitizenReport
-from backend.app.schemas.citizen_report import CitizenReportCreate, CitizenReportUpdate
-from backend.app.services.audit_service import log_audit_event
+from app.db.database import get_db
+from app.db.models.citizen_report import CitizenReport
+from app.schemas.citizen_report import CitizenReportCreate, CitizenReportUpdate
+from app.services.audit_service import log_audit_event
 
 router = APIRouter()
 

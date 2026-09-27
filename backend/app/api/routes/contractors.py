@@ -2,14 +2,14 @@ from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from backend.app.db.database import get_db
-from backend.app.db.models.contractor import ContractorWorkPackage, ContractorProgressLog
-from backend.app.schemas.operational import (
+from app.db.database import get_db
+from app.db.models.contractor import ContractorWorkPackage, ContractorProgressLog
+from app.schemas.operational import (
     ContractorPackageCreateRequest,
     ContractorProgressSubmitRequest,
     ContractorProgressVerifyRequest,
 )
-from backend.app.services.contractor_service import (
+from app.services.contractor_service import (
     create_work_package,
     submit_contractor_progress,
     verify_contractor_progress,

@@ -2,15 +2,15 @@ from typing import List, Optional, Any, Dict
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 import uuid
-from backend.app.db.database import get_db
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.stakeholder import Stakeholder
-from backend.app.db.models.route import Route
-from backend.app.schemas.project import ProjectCreate, ProjectUpdate
-from backend.app.api.deps import require_roles, get_current_user
-from backend.app.core.security import UserRole
-from backend.app.services.audit_service import log_audit_event
+from app.db.database import get_db
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.stakeholder import Stakeholder
+from app.db.models.route import Route
+from app.schemas.project import ProjectCreate, ProjectUpdate
+from app.api.deps import require_roles, get_current_user
+from app.core.security import UserRole
+from app.services.audit_service import log_audit_event
 
 router = APIRouter()
 
@@ -85,9 +85,9 @@ def create_project(
     project_in: ProjectCreate,
     db: Session = Depends(get_db),
 ):
-    from backend.app.services.design_service import generate_ai_designs
-    from backend.app.services.assignment_service import assign_project_officers_automatically
-    from backend.app.db.models.notification import Notification
+    from app.services.design_service import generate_ai_designs
+    from app.services.assignment_service import assign_project_officers_automatically
+    from app.db.models.notification import Notification
     from datetime import datetime, timezone
 
     # Resolve project ID/code
@@ -219,7 +219,7 @@ def api_auto_assign_team(
     db: Session = Depends(get_db),
 ):
     """Triggers/Re-runs automatic AI team assignment across all 6 core project roles."""
-    from backend.app.services.assignment_service import assign_project_officers_automatically
+    from app.services.assignment_service import assign_project_officers_automatically
     return assign_project_officers_automatically(
         db=db,
         project_id=project_id,
@@ -232,14 +232,14 @@ def api_auto_assign_team(
 @router.get("/{project_id}/team", response_model=Dict[str, Any])
 def api_get_project_team(project_id: str, db: Session = Depends(get_db)):
     """Returns all current project team assignments, role profiles, and capacity statuses."""
-    from backend.app.services.assignment_service import get_project_team_details
+    from app.services.assignment_service import get_project_team_details
     return get_project_team_details(db, project_id=project_id)
 
 
 @router.get("/{project_id}/allocation-details", response_model=Dict[str, Any])
 def api_get_allocation_details(project_id: str, db: Session = Depends(get_db)):
     """Returns transparent mathematical breakdown, scoring, and explainability for judge review."""
-    from backend.app.services.assignment_service import get_project_allocation_details
+    from app.services.assignment_service import get_project_allocation_details
     return get_project_allocation_details(db, project_id=project_id)
 
 

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Integer, Float, Boolean, DateTime, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
-from backend.app.db.database import Base
+from app.db.database import Base
 
 
 class FieldVerification(Base):

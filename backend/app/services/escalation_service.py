@@ -9,11 +9,11 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 
-from backend.app.db.models.field_verification import FieldVerification
-from backend.app.db.models.notification import Notification
-from backend.app.db.models.audit import AuditLog
-from backend.app.db.models.government_alert import GovernmentAlert
-from backend.app.db.models.project import Project
+from app.db.models.field_verification import FieldVerification
+from app.db.models.notification import Notification
+from app.db.models.audit import AuditLog
+from app.db.models.government_alert import GovernmentAlert
+from app.db.models.project import Project
 
 
 ESCALATION_HIERARCHY = [

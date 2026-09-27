@@ -6,7 +6,7 @@ by applying modifications to feature vectors without altering database records.
 
 from typing import Dict, Any, List
 import copy
-from backend.app.ml.predict import predict_project_risk
+from app.ml.predict import predict_project_risk
 
 
 WHAT_IF_LEVER_DEFINITIONS = {

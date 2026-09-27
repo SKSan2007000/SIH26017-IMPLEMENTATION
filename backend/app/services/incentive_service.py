@@ -10,8 +10,8 @@ from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
-from backend.app.db.models.officer_performance import OfficerProfile, OfficerScore
-from backend.app.db.models.audit import AuditLog
+from app.db.models.officer_performance import OfficerProfile, OfficerScore
+from app.db.models.audit import AuditLog
 
 
 POINT_RULES: Dict[str, int] = {

@@ -65,20 +65,42 @@ class Settings(BaseSettings):
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
-        # Also check CORS_ORIGINS from environment if provided
-        env_cors = os.environ.get("CORS_ORIGINS")
-        if env_cors and not v:
+        origins: List[str] = [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:8000",
+            "https://sih-26017-implementation-cgq5.vercel.app",
+        ]
+        frontend_url = os.environ.get("FRONTEND_URL")
+        if frontend_url and frontend_url not in origins:
+            origins.append(frontend_url)
+
+        env_cors = os.environ.get("CORS_ORIGINS") or os.environ.get("BACKEND_CORS_ORIGINS")
+        if env_cors:
             v = env_cors
+
         if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",") if i.strip()]
+            for item in v.split(","):
+                item_clean = item.strip()
+                if item_clean and item_clean not in origins:
+                    origins.append(item_clean)
+            return origins
         elif isinstance(v, str) and v.startswith("["):
             try:
-                return json.loads(v)
+                parsed = json.loads(v)
+                for item in parsed:
+                    if item not in origins:
+                        origins.append(item)
+                return origins
             except Exception:
-                return ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://127.0.0.1:8000"]
+                return origins
         elif isinstance(v, list):
-            return v
-        return ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://127.0.0.1:8000"]
+            for item in v:
+                if item not in origins:
+                    origins.append(item)
+            return origins
+        return origins
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 

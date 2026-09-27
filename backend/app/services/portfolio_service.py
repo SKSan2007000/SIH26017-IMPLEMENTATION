@@ -11,15 +11,15 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from fastapi import HTTPException
 
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.stakeholder import Stakeholder
-from backend.app.db.models.field_verification import FieldVerification
-from backend.app.db.models.risk import RiskPrediction
-from backend.app.db.models.officer_performance import OfficerProfile
-from backend.app.db.models.contractor import ContractorWorkPackage
-from backend.app.db.models.design import ProjectAssignment, Design
-from backend.app.db.models.audit import AuditLog
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.stakeholder import Stakeholder
+from app.db.models.field_verification import FieldVerification
+from app.db.models.risk import RiskPrediction
+from app.db.models.officer_performance import OfficerProfile
+from app.db.models.contractor import ContractorWorkPackage
+from app.db.models.design import ProjectAssignment, Design
+from app.db.models.audit import AuditLog
 
 
 def get_portfolio_summary(db: Session) -> Dict[str, Any]:

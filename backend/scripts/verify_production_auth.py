@@ -10,10 +10,10 @@ for p in [root_dir, backend_dir]:
         sys.path.insert(0, p)
 
 from fastapi.testclient import TestClient
-from backend.main import app
-from backend.app.core.security import verify_password
-from backend.app.db.database import SessionLocal, init_db, engine
-from backend.app.db.models.user import User
+from main import app
+from app.core.security import verify_password
+from app.db.database import SessionLocal, init_db, engine
+from app.db.models.user import User
 
 client = TestClient(app)
 

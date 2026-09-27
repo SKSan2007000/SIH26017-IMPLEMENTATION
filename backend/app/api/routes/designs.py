@@ -6,8 +6,8 @@ from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from backend.app.db.database import get_db
-from backend.app.schemas.design import (
+from app.db.database import get_db
+from app.schemas.design import (
     DesignResponse,
     DesignGenerateRequest,
     DesignVersionCreate,
@@ -20,7 +20,7 @@ from backend.app.schemas.design import (
     DesignChangeRequestResponse,
     DesignPackageResponse,
 )
-from backend.app.services.design_service import (
+from app.services.design_service import (
     get_project_designs,
     generate_ai_designs,
     create_design_version,
@@ -31,7 +31,7 @@ from backend.app.services.design_service import (
     create_design_change_request,
     review_design_change_request,
 )
-from backend.app.db.models.design import Design, DesignChangeRequest
+from app.db.models.design import Design, DesignChangeRequest
 
 router = APIRouter(prefix="/designs", tags=["Multi-Design & Versioning Engine"])
 

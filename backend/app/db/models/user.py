@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Boolean, DateTime, Enum as SQLEnum
-from backend.app.db.database import Base
-from backend.app.core.security import UserRole
+from app.db.database import Base
+from app.core.security import UserRole
 
 
 class User(Base):

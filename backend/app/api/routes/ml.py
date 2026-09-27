@@ -5,16 +5,16 @@ Provides direct access to model diagnostics, inference, what-if simulations, and
 
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
-from backend.app.schemas.ml import (
+from app.schemas.ml import (
     PredictRequest,
     PredictResponse,
     ModelInfoResponse,
     TrainRequest,
     TrainResponse,
 )
-from backend.app.ml.predict import predict_project_risk, get_or_load_models
-from backend.app.ml.train import train_and_evaluate_models
-from backend.app.ml.simulate import simulate_what_if_interventions, simulate_combined_what_if
+from app.ml.predict import predict_project_risk, get_or_load_models
+from app.ml.train import train_and_evaluate_models
+from app.ml.simulate import simulate_what_if_interventions, simulate_combined_what_if
 
 
 router = APIRouter()

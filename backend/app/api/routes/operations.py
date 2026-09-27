@@ -6,11 +6,11 @@ from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
-from backend.app.db.database import get_db
-from backend.app.db.models.field_verification import FieldVerification
-from backend.app.db.models.government_alert import GovernmentAlert
-from backend.app.db.models.stakeholder_benefit import StakeholderBenefitRecord
-from backend.app.schemas.operational import (
+from app.db.database import get_db
+from app.db.models.field_verification import FieldVerification
+from app.db.models.government_alert import GovernmentAlert
+from app.db.models.stakeholder_benefit import StakeholderBenefitRecord
+from app.schemas.operational import (
     OfficerAutoAssignRequest,
     TaskAcceptRequest,
     TaskCompleteRequest,
@@ -21,16 +21,16 @@ from backend.app.schemas.operational import (
     ClosedLoopInterventionResponse,
     StakeholderBenefitCreateRequest,
 )
-from backend.app.services.assignment_service import (
+from app.services.assignment_service import (
     assign_field_task_automatically,
     get_officers_workload_status,
     assign_project_officers_automatically,
 )
-from backend.app.services.escalation_service import check_and_escalate_task, scan_and_process_all_overdue_tasks
-from backend.app.services.incentive_service import award_officer_points, get_officer_leaderboard
-from backend.app.services.closed_loop_service import execute_closed_loop_intervention, get_project_intervention_history
-from backend.app.services.daily_ops_service import get_todays_operations_queue, generate_daily_executive_reports
-from backend.app.services.workflow_service import update_parcel_workflow_status
+from app.services.escalation_service import check_and_escalate_task, scan_and_process_all_overdue_tasks
+from app.services.incentive_service import award_officer_points, get_officer_leaderboard
+from app.services.closed_loop_service import execute_closed_loop_intervention, get_project_intervention_history
+from app.services.daily_ops_service import get_todays_operations_queue, generate_daily_executive_reports
+from app.services.workflow_service import update_parcel_workflow_status
 
 router = APIRouter(prefix="/operations", tags=["Daily Operations & Automation"])
 
@@ -169,7 +169,7 @@ def api_reassign_task(
     db: Session = Depends(get_db),
 ) -> Dict[str, Any]:
     """Reassigns a field verification task to an available alternate officer."""
-    from backend.app.services.assignment_service import reassign_field_task
+    from app.services.assignment_service import reassign_field_task
     task = reassign_field_task(db, task_id=task_id, reason=reason)
     return {
         "taskId": task.id,
@@ -495,7 +495,7 @@ def api_reset_demo_data(db: Session = Depends(get_db)) -> Dict[str, Any]:
     Safely resets and reseeds the demonstration dataset with clean synthetic state.
     Restricted for competition judging and live demonstration purposes.
     """
-    from backend.app.db.seed import seed_database
+    from app.db.seed import seed_database
     seed_database(db, force=True)
     return {
         "status": "SUCCESS",

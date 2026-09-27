@@ -8,7 +8,7 @@ import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from backend.scripts.test_ml_suite import (
+from scripts.test_ml_suite import (
     test_dataset_generation_scale_and_schema,
     test_dataset_correlation_and_physics,
     test_preprocessing_pipeline_fit_transform,

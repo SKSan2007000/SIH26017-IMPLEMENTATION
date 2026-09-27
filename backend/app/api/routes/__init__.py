@@ -1,22 +1,22 @@
 from fastapi import APIRouter
-from backend.app.api.routes.auth import router as auth_router
-from backend.app.api.routes.projects import router as projects_router
-from backend.app.api.routes.routes import router as routes_router
-from backend.app.api.routes.parcels import router as parcels_router
-from backend.app.api.routes.stakeholders import router as stakeholders_router
-from backend.app.api.routes.documents import router as documents_router
-from backend.app.api.routes.notifications import router as notifications_router
-from backend.app.api.routes.field_verifications import router as field_router
-from backend.app.api.routes.citizen_reports import router as citizen_router
-from backend.app.api.routes.risk import router as risk_router
-from backend.app.api.routes.ml import router as ml_router
-from backend.app.api.routes.audit import router as audit_router
-from backend.app.api.routes.workflow import router as workflow_router
-from backend.app.api.routes.operations import router as operations_router
-from backend.app.api.routes.contractors import router as contractors_router
-from backend.app.api.routes.designs import router as designs_router
-from backend.app.api.routes.portfolio import router as portfolio_router
-from backend.app.api.routes.gis import router as gis_router
+from app.api.routes.auth import router as auth_router
+from app.api.routes.projects import router as projects_router
+from app.api.routes.routes import router as routes_router
+from app.api.routes.parcels import router as parcels_router
+from app.api.routes.stakeholders import router as stakeholders_router
+from app.api.routes.documents import router as documents_router
+from app.api.routes.notifications import router as notifications_router
+from app.api.routes.field_verifications import router as field_router
+from app.api.routes.citizen_reports import router as citizen_router
+from app.api.routes.risk import router as risk_router
+from app.api.routes.ml import router as ml_router
+from app.api.routes.audit import router as audit_router
+from app.api.routes.workflow import router as workflow_router
+from app.api.routes.operations import router as operations_router
+from app.api.routes.contractors import router as contractors_router
+from app.api.routes.designs import router as designs_router
+from app.api.routes.portfolio import router as portfolio_router
+from app.api.routes.gis import router as gis_router
 
 api_router = APIRouter()
 

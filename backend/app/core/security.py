@@ -3,7 +3,7 @@ from typing import Any, Union, Optional
 from enum import Enum
 import jwt
 import bcrypt
-from backend.app.core.config import settings
+from app.core.config import settings
 
 
 class UserRole(str, Enum):

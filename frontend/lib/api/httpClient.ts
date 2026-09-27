@@ -17,6 +17,9 @@ export function getApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_URL !== undefined && process.env.NEXT_PUBLIC_API_URL !== '') {
     return process.env.NEXT_PUBLIC_API_URL;
   }
+  if (process.env.VITE_API_URL !== undefined && process.env.VITE_API_URL !== '') {
+    return process.env.VITE_API_URL;
+  }
   // Client-side execution in browser
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;

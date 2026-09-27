@@ -19,15 +19,15 @@ import uuid
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from fastapi.testclient import TestClient
-from backend.app.main import app
-from backend.app.db.database import SessionLocal
-from backend.app.db.models.project import Project
-from backend.app.db.models.user import User
-from backend.app.db.models.officer_performance import OfficerProfile
-from backend.app.db.models.design import ProjectAssignment
-from backend.app.db.models.notification import Notification
-from backend.app.db.models.audit import AuditLog
-from backend.app.db.seed import seed_database
+from app.main import app
+from app.db.database import SessionLocal
+from app.db.models.project import Project
+from app.db.models.user import User
+from app.db.models.officer_performance import OfficerProfile
+from app.db.models.design import ProjectAssignment
+from app.db.models.notification import Notification
+from app.db.models.audit import AuditLog
+from app.db.seed import seed_database
 
 client = TestClient(app)
 

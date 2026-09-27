@@ -15,11 +15,11 @@ import uuid
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from fastapi.testclient import TestClient
-from backend.app.main import app
-from backend.app.db.database import SessionLocal
-from backend.app.db.models.officer_performance import OfficerProfile
-from backend.app.db.models.project import Project
-from backend.app.services.assignment_service import (
+from app.main import app
+from app.db.database import SessionLocal
+from app.db.models.officer_performance import OfficerProfile
+from app.db.models.project import Project
+from app.services.assignment_service import (
     find_best_eligible_officer,
     get_officers_workload_status,
     assign_project_officers_automatically,

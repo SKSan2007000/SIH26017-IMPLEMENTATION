@@ -27,25 +27,25 @@ import pytest
 from datetime import datetime, timezone, timedelta
 from fastapi.testclient import TestClient
 
-from backend.app.main import app
-from backend.app.db.database import SessionLocal, Base, engine
-from backend.app.db.seed import seed_database
-from backend.app.db.models import (
+from app.main import app
+from app.db.database import SessionLocal, Base, engine
+from app.db.seed import seed_database
+from app.db.models import (
     Project, Parcel, Stakeholder, FieldVerification, Document,
     CitizenReport, Notification, RiskPrediction, RiskFactor, AuditLog,
     OfficerProfile, OfficerScore, ContractorWorkPackage, ContractorProgressLog,
     InterventionRecord, GovernmentAlert, StakeholderBenefitRecord
 )
-from backend.app.services.workflow_service import (
+from app.services.workflow_service import (
     transition_project_state, update_parcel_workflow_status, calculate_project_actual_progress,
     PROJECT_WORKFLOW_STATES, PARCEL_WORKFLOW_STATES
 )
-from backend.app.services.assignment_service import find_best_eligible_officer, assign_field_task_automatically
-from backend.app.services.escalation_service import check_and_escalate_task, scan_and_process_all_overdue_tasks
-from backend.app.services.incentive_service import award_officer_points, get_officer_leaderboard
-from backend.app.services.closed_loop_service import execute_closed_loop_intervention, get_project_intervention_history
-from backend.app.services.daily_ops_service import get_todays_operations_queue, generate_daily_executive_reports
-from backend.app.services.contractor_service import create_work_package, submit_contractor_progress, verify_contractor_progress
+from app.services.assignment_service import find_best_eligible_officer, assign_field_task_automatically
+from app.services.escalation_service import check_and_escalate_task, scan_and_process_all_overdue_tasks
+from app.services.incentive_service import award_officer_points, get_officer_leaderboard
+from app.services.closed_loop_service import execute_closed_loop_intervention, get_project_intervention_history
+from app.services.daily_ops_service import get_todays_operations_queue, generate_daily_executive_reports
+from app.services.contractor_service import create_work_package, submit_contractor_progress, verify_contractor_progress
 
 client = TestClient(app)
 

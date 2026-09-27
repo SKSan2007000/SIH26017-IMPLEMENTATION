@@ -11,13 +11,13 @@ Verifies:
 
 import pytest
 from fastapi.testclient import TestClient
-from backend.app.main import app
-from backend.app.db.database import SessionLocal
-from backend.app.db.seed import seed_database
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.route import Route
-from backend.app.db.models.audit import AuditLog
+from app.main import app
+from app.db.database import SessionLocal
+from app.db.seed import seed_database
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.route import Route
+from app.db.models.audit import AuditLog
 
 client = TestClient(app)
 

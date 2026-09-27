@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
-from backend.app.db.database import Base
+from app.db.database import Base
 
 
 class Parcel(Base):

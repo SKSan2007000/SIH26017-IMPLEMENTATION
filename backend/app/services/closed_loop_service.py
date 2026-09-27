@@ -10,13 +10,13 @@ from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.intervention import InterventionRecord
-from backend.app.db.models.notification import Notification
-from backend.app.db.models.audit import AuditLog
-from backend.app.services.risk_service import recalculate_and_persist_project_risk, get_project_live_risk
-from backend.app.services.incentive_service import award_officer_points
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.intervention import InterventionRecord
+from app.db.models.notification import Notification
+from app.db.models.audit import AuditLog
+from app.services.risk_service import recalculate_and_persist_project_risk, get_project_live_risk
+from app.services.incentive_service import award_officer_points
 
 
 def execute_closed_loop_intervention(

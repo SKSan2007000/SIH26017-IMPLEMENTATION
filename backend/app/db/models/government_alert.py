@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text
-from backend.app.db.database import Base
+from app.db.database import Base
 
 
 class GovernmentAlert(Base):

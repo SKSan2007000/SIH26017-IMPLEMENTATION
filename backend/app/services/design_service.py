@@ -12,18 +12,18 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from backend.app.db.models.project import Project
-from backend.app.db.models.parcel import Parcel
-from backend.app.db.models.design import (
+from app.db.models.project import Project
+from app.db.models.parcel import Parcel
+from app.db.models.design import (
     Design,
     DesignVersion,
     DesignChangeRequest,
     DesignPackage,
 )
-from backend.app.db.models.audit import AuditLog
-from backend.app.db.models.notification import Notification
-from backend.app.services.spatial_service import check_route_parcel_spatial_intersection
-from backend.app.ml.predict import predict_project_risk
+from app.db.models.audit import AuditLog
+from app.db.models.notification import Notification
+from app.services.spatial_service import check_route_parcel_spatial_intersection
+from app.ml.predict import predict_project_risk
 
 
 DEFAULT_DESIGN_STRATEGIES = [

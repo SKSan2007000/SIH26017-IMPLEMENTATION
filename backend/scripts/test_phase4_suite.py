@@ -11,10 +11,10 @@ from fastapi.testclient import TestClient
 # Add project root to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from backend.app.main import app
-from backend.app.db.database import SessionLocal
-from backend.app.db.seed import seed_database
-from backend.tests.test_phase4_operations import (
+from app.main import app
+from app.db.database import SessionLocal
+from app.db.seed import seed_database
+from tests.test_phase4_operations import (
     test_01_project_state_machine_valid_transition,
     test_02_project_state_machine_invalid_transition_rejected,
     test_03_project_state_machine_all_15_states_defined,

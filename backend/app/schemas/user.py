@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Union
 from pydantic import BaseModel, EmailStr
-from backend.app.core.security import UserRole
+from app.core.security import UserRole
 
 
 class UserBase(BaseModel):
