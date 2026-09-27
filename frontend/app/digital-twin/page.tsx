@@ -7,7 +7,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { DemoFlag } from '@/components/ui/Primitives';
 import { useAppStore } from '@/lib/store/useAppStore';
 
-const CesiumTwin = dynamic(() => import('@/components/threeD/CesiumTwin').then((m) => m.CesiumTwin), {
+const CesiumTwin = dynamic(() => import('@/components/threeD/CesiumTwin').then((m) => m.CesiumTwin || m.default), {
   ssr: false,
   loading: () => (
     <div className="flex h-[calc(100vh-150px)] items-center justify-center rounded-xl border border-hair font-mono text-[12px] text-txt-tertiary">

@@ -38,6 +38,45 @@ import clsx from 'clsx';
 
 type CesiumModule = typeof import('cesium');
 
+async function loadCesiumModule(): Promise<CesiumModule> {
+  if (typeof window !== 'undefined' && (window as any).Cesium) {
+    return (window as any).Cesium as CesiumModule;
+  }
+  if (typeof window !== 'undefined') {
+    (window as any).CESIUM_BASE_URL = '/cesium';
+  }
+  try {
+    const mod = await import('cesium');
+    return mod as CesiumModule;
+  } catch (chunkErr) {
+    console.warn('[CesiumTwin] Webpack chunk import failed, loading standalone /cesium/Cesium.js:', chunkErr);
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined') return reject(new Error('SSR not supported for Cesium'));
+      if ((window as any).Cesium) return resolve((window as any).Cesium as CesiumModule);
+
+      const existing = document.querySelector('script[src="/cesium/Cesium.js"]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve((window as any).Cesium as CesiumModule));
+        existing.addEventListener('error', (e) => reject(e));
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = '/cesium/Cesium.js';
+      script.async = true;
+      script.onload = () => {
+        if ((window as any).Cesium) {
+          resolve((window as any).Cesium as CesiumModule);
+        } else {
+          reject(new Error('Cesium global not found after loading /cesium/Cesium.js'));
+        }
+      };
+      script.onerror = (err) => reject(new Error(`Failed to load /cesium/Cesium.js script: ${err}`));
+      document.head.appendChild(script);
+    });
+  }
+}
+
 export function CesiumTwin() {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<import('cesium').Viewer | null>(null);
@@ -160,9 +199,7 @@ export function CesiumTwin() {
       setReady(false);
 
       try {
-        (window as unknown as { CESIUM_BASE_URL?: string }).CESIUM_BASE_URL = '/cesium';
-
-        const Cesium = await import('cesium');
+        const Cesium = await loadCesiumModule();
         if (cancelled || !containerRef.current) return;
         cesiumRef.current = Cesium;
 
@@ -751,3 +788,5 @@ export function CesiumTwin() {
     </div>
   );
 }
+
+export default CesiumTwin;
