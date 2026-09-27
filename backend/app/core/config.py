@@ -1,12 +1,15 @@
 import os
 import json
+import logging
 from typing import List, Union, Optional
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+logger = logging.getLogger("landguard.config")
+
 
 def get_default_db_url() -> str:
-    """Resolve database URL from various production environment variable names, defaulting to canonical workspace SQLite path."""
+    """Resolve database URL from various production environment variable names, normalizing postgres:// to postgresql://."""
     url = (
         os.environ.get("DATABASE_URL")
         or os.environ.get("POSTGRES_URL")
@@ -19,10 +22,36 @@ def get_default_db_url() -> str:
             url = url.replace("postgres://", "postgresql://", 1)
         return url
 
+    is_prod = (
+        os.environ.get("ENVIRONMENT", "").lower() in ["production", "prod"]
+        or bool(os.environ.get("RAILWAY_ENVIRONMENT"))
+        or bool(os.environ.get("RAILWAY_PROJECT_ID"))
+    )
+    
+    if is_prod and not os.environ.get("ALLOW_SQLITE_IN_PROD"):
+        logger.warning("DATABASE_URL is not set in production. Using local SQLite fallback. Set DATABASE_URL in Railway for persistent PostgreSQL.")
+
     # Canonical SQLite path anchored to workspace / backend root directory
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     db_path = os.path.join(base_dir, "landguard.db")
     return f"sqlite:///{db_path}"
+
+
+def get_masked_db_url(url: str) -> str:
+    """Returns database type and masked connection target without exposing credentials."""
+    if not url:
+        return "None"
+    if url.startswith("sqlite"):
+        return f"SQLite ({url.split('///')[-1] if '///' in url else 'local'})"
+    try:
+        prefix, rest = url.split("://", 1)
+        if "@" in rest:
+            user_part, host_part = rest.split("@", 1)
+            username = user_part.split(":")[0]
+            return f"{prefix}://{username}:****@{host_part}"
+        return f"{prefix}://{rest}"
+    except Exception:
+        return "PostgreSQL (configured)"
 
 
 def get_default_secret_key() -> str:
@@ -51,7 +80,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = get_default_algorithm()
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))  # 24 hours
 
-    # Database URL: default SQLite for instant portability, or PostgreSQL+PostGIS
+    # Database URL: PostgreSQL+PostGIS on Railway or SQLite local fallback
     DATABASE_URL: str = get_default_db_url()
 
     # CORS origins
@@ -60,6 +89,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
+        "https://sih-26017-implementation-cgq5.vercel.app",
     ]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
@@ -106,4 +136,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-

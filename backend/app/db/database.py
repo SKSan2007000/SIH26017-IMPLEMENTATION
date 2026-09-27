@@ -104,9 +104,9 @@ def ensure_schema_migrations(eng=None):
                     ("verification", "VARCHAR DEFAULT 'PENDING'"),
                     ("acquisition_status", "VARCHAR DEFAULT 'NOT STARTED'"),
                     ("polygon_coords", "JSON"),
-                    ("structures_present", "BOOLEAN DEFAULT 0"),
+                    ("structures_present", "BOOLEAN DEFAULT FALSE"),
                     ("structure_type", "VARCHAR"),
-                    ("disputed", "BOOLEAN DEFAULT 0"),
+                    ("disputed", "BOOLEAN DEFAULT FALSE"),
                     ("risk_contribution", "VARCHAR DEFAULT 'low'"),
                     ("area_sq_ft", "FLOAT DEFAULT 10000.0"),
                     ("documents_complete", "INTEGER DEFAULT 0"),
@@ -145,6 +145,26 @@ def ensure_schema_migrations(eng=None):
             if "field_verifications" in tables:
                 cols = [c["name"] for c in inspector.get_columns("field_verifications")]
                 new_fv_cols = [
+                    ("task_created_at", "DATETIME"),
+                    ("accepted_at", "DATETIME"),
+                    ("completed_at", "DATETIME"),
+                    ("deadline_at", "DATETIME"),
+                    ("response_time_seconds", "FLOAT"),
+                    ("completion_time_seconds", "FLOAT"),
+                    ("sla_status", "VARCHAR DEFAULT 'ON_TIME'"),
+                    ("sla_seconds_allowed", "INTEGER DEFAULT 300"),
+                    ("escalation_level", "VARCHAR DEFAULT 'NONE'"),
+                    ("escalated_at", "DATETIME"),
+                    ("escalation_reason", "VARCHAR"),
+                    ("verification_status", "VARCHAR DEFAULT 'PENDING'"),
+                    ("gps_captured", "BOOLEAN DEFAULT TRUE"),
+                    ("gps_coordinates", "JSON"),
+                    ("photos_count", "INTEGER DEFAULT 0"),
+                    ("videos_count", "INTEGER DEFAULT 0"),
+                    ("photo_evidence_ref", "VARCHAR"),
+                    ("video_evidence_ref", "VARCHAR"),
+                    ("assigned_date", "VARCHAR"),
+                    ("completed_date", "VARCHAR"),
                     ("allocation_reason", "VARCHAR"),
                     ("officer_zone", "VARCHAR"),
                     ("officer_district", "VARCHAR"),
@@ -157,13 +177,31 @@ def ensure_schema_migrations(eng=None):
                         conn.execute(text(f"ALTER TABLE field_verifications ADD COLUMN {col_name} {col_type}"))
                 conn.commit()
 
+            if "risk_predictions" in tables:
+                cols = [c["name"] for c in inspector.get_columns("risk_predictions")]
+                new_rp_cols = [
+                    ("delay_probability", "FLOAT DEFAULT 0.50"),
+                    ("risk_score", "INTEGER DEFAULT 50"),
+                    ("risk_category", "VARCHAR DEFAULT 'MEDIUM'"),
+                    ("expected_delay_months", "FLOAT DEFAULT 3.5"),
+                    ("expected_delay_days", "INTEGER DEFAULT 105"),
+                    ("model_version", "VARCHAR DEFAULT '1.0.0-rf'"),
+                    ("recommendations", "JSON"),
+                    ("prediction_metadata", "JSON"),
+                    ("predicted_at", "DATETIME"),
+                ]
+                for col_name, col_type in new_rp_cols:
+                    if col_name not in cols:
+                        conn.execute(text(f"ALTER TABLE risk_predictions ADD COLUMN {col_name} {col_type}"))
+                conn.commit()
+
             if "officer_profiles" in tables:
                 cols = [c["name"] for c in inspector.get_columns("officer_profiles")]
                 new_op_cols = [
                     ("points_tier", "VARCHAR DEFAULT 'Gold'"),
                     ("active_district", "VARCHAR DEFAULT 'Chennai'"),
                     ("current_workload", "INTEGER DEFAULT 0"),
-                    ("is_available", "BOOLEAN DEFAULT 1"),
+                    ("is_available", "BOOLEAN DEFAULT TRUE"),
                 ]
                 for col_name, col_type in new_op_cols:
                     if col_name not in cols:
@@ -214,8 +252,8 @@ def init_db(target_engine=None):
         logger.error(f"Error initializing database: {e}", exc_info=True)
 
 
-# Run initial migration and schema setup on load
-init_db(engine)
+# Note: DB initialization runs cleanly in FastAPI lifespan or lazily in get_db
+# init_db(engine) removed from top-level to prevent blocking module import
 
 
 def get_db():

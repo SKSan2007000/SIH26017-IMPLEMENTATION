@@ -22,6 +22,15 @@ from app.api.routes import api_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Safe production startup diagnostics (zero secrets logged)
+    from app.core.config import get_masked_db_url
+    print("===================================================")
+    print(">>> LandGuard AI Backend Starting Up")
+    print(f"   Environment: {'Production (Railway)' if os.environ.get('RAILWAY_ENVIRONMENT') else 'Local/Development'}")
+    print(f"   Database:    {get_masked_db_url(settings.DATABASE_URL)}")
+    print(f"   API Version: {settings.API_V1_STR}")
+    print("===================================================")
+
     # Startup: Create tables and auto-seed if empty
     init_db(engine)
     db = SessionLocal()
