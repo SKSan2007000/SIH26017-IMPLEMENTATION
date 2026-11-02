@@ -22,6 +22,13 @@ export function getApiBaseUrl(): string {
   if (process.env.VITE_API_URL !== undefined && process.env.VITE_API_URL.trim() !== '') {
     return process.env.VITE_API_URL.trim().replace(/\/+$/, '');
   }
+  // When running in the browser on localhost or 127.0.0.1 without explicit env var, connect to local backend
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://127.0.0.1:8000';
+    }
+  }
   return DEFAULT_RAILWAY_BACKEND_URL;
 }
 
